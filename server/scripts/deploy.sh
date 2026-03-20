@@ -26,7 +26,10 @@ Requires=docker.service
 [Service]
 Restart=always
 ExecStartPre=-/usr/bin/docker rm -f detector-server
-ExecStart=/usr/bin/docker run --rm -p 8000:8000 --name detector-server detector-server:latest
+ExecStart=/usr/bin/docker run --rm -p 8000:8000 \
+  -e LOG_FILE=/app/logs/requests.log \
+  -v /opt/detector-server/logs:/app/logs \
+  --name detector-server detector-server:latest
 ExecStop=/usr/bin/docker stop detector-server
 
 [Install]

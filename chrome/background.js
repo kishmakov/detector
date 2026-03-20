@@ -17,4 +17,10 @@ chrome.contextMenus.onClicked.addListener(async (info) => {
   });
   const data = await resp.json();
   console.log('[detector] word_count:', data.word_count);
+  chrome.notifications.create({
+    type: 'basic',
+    iconUrl: 'found.png',
+    title: 'Detector',
+    message: `Word count: ${data.word_count}`,
+  });
 });

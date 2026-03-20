@@ -3,7 +3,7 @@
   "name": "Detector",
   "version": "1.0",
   "description": "Send selected text to the analyze endpoint",
-  "permissions": ["contextMenus"],
+  "permissions": ["contextMenus", "notifications"],
   "host_permissions": ["http://*/*"],
   "background": {
     "service_worker": "background.js",
