@@ -14,10 +14,10 @@ rsync -az --delete \
   "$REMOTE:$REMOTE_DIR/"
 
 echo "==> Building Docker image on remote"
-ssh "$REMOTE" "cd $REMOTE_DIR && docker build -t detector-server:latest ."
+ssh "$REMOTE" "cd $REMOTE_DIR && sudo docker build -t detector-server:latest ."
 
 echo "==> Writing systemd unit"
-ssh "$REMOTE" "cat > /etc/systemd/system/detector-server.service" <<'EOF'
+ssh "$REMOTE" "sudo tee /etc/systemd/system/detector-server.service > /dev/null" <<'EOF'
 [Unit]
 Description=Detector Server
 After=docker.service
@@ -34,13 +34,11 @@ WantedBy=multi-user.target
 EOF
 
 echo "==> Reloading and restarting service"
-ssh "$REMOTE" "systemctl daemon-reload && systemctl enable detector-server && systemctl restart detector-server"
+ssh "$REMOTE" "sudo systemctl daemon-reload && sudo systemctl enable detector-server && sudo systemctl restart detector-server"
 
 echo "==> Waiting for service to start..."
-sleep 3
-
-echo "==> Health check"
-if ssh "$REMOTE" "curl -sf http://localhost:8000/health"; then
+echo "==> Health check (retrying up to 30s)"
+if ssh "$REMOTE" "for i in \$(seq 1 10); do curl -sf http://localhost:8000/health && exit 0; sleep 3; done; exit 1"; then
   echo ""
   echo "Deploy successful."
 else

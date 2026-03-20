@@ -29,31 +29,36 @@ def test_newlines():
     assert count_words("hello\nworld\nfoo") == 3
 
 
-# --- HTTP integration tests ---
+# --- HTTP integration tests (run against both local and live client) ---
 
-def test_analyze_200(client):
-    resp = client.post("/analyze", json={"text": "hello world from the chrome extension"})
+@pytest.mark.http
+def test_health(any_client):
+    resp = any_client.get("/health")
+    assert resp.status_code == 200
+    assert resp.json() == {"status": "ok"}
+
+
+@pytest.mark.http
+def test_analyze_200(any_client):
+    resp = any_client.post("/analyze", json={"text": "hello world from the chrome extension"})
     assert resp.status_code == 200
     assert resp.json() == {"word_count": 6}
 
 
-def test_analyze_empty_text(client):
-    resp = client.post("/analyze", json={"text": ""})
+@pytest.mark.http
+def test_analyze_empty_text(any_client):
+    resp = any_client.post("/analyze", json={"text": ""})
     assert resp.status_code == 200
     assert resp.json() == {"word_count": 0}
 
 
-def test_analyze_missing_field(client):
-    resp = client.post("/analyze", json={})
+@pytest.mark.http
+def test_analyze_missing_field(any_client):
+    resp = any_client.post("/analyze", json={})
     assert resp.status_code == 422
 
 
-def test_analyze_wrong_type(client):
-    resp = client.post("/analyze", json={"text": 123})
+@pytest.mark.http
+def test_analyze_wrong_type(any_client):
+    resp = any_client.post("/analyze", json={"text": 123})
     assert resp.status_code == 422
-
-
-def test_health(client):
-    resp = client.get("/health")
-    assert resp.status_code == 200
-    assert resp.json() == {"status": "ok"}

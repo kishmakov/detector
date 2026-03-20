@@ -9,8 +9,17 @@ The `server/` directory contains a Python + FastAPI backend that provides text a
 - **Stack:** Python 3.11, FastAPI, Uvicorn, Pydantic v2
 - **Venv:** `server/.venv/` — activate with `source .venv/bin/activate` or run directly via `.venv/bin/pytest`, `.venv/bin/uvicorn`
 - **Run locally:** `docker-compose up` (hot reload) or `uvicorn app.main:app --reload` inside the venv
-- **Run tests:** `.venv/bin/pytest tests/ -v`
+- **Run tests (local):** `.venv/bin/pytest tests/test_analyze.py -v`
+- **Run tests (live):** `bash scripts/test_live.sh` — hits the deployed service at `DETECTOR_BASE_URL`
 - **Deploy:** `bash scripts/deploy.sh` — rsyncs to remote host aliased `GC` in `~/.ssh/config`, builds Docker image on remote, manages via systemd unit
+
+#### Config
+
+| Variable | Default | Description |
+|---|---|---|
+| `DETECTOR_BASE_URL` | `http://35.209.211.6:8000` | Base URL of the deployed service, used by live tests |
+
+Copy `.env.example` to `.env` to override locally.
 
 #### Layout
 
@@ -23,9 +32,12 @@ server/
 │   └── services/
 │       └── text_analysis.py # count_words() — pure business logic
 ├── tests/
-│   ├── conftest.py          # Session-scoped TestClient fixture
-│   └── test_analyze.py      # Unit + integration tests
-├── scripts/deploy.sh        # Single-command remote deploy
+│   ├── conftest.py          # TestClient + live_client fixtures
+│   ├── test_analyze.py      # Unit + local integration tests
+│   └── test_live.py         # Integration tests against live service
+├── scripts/
+│   ├── deploy.sh            # Single-command remote deploy
+│   └── test_live.sh         # Run live tests against deployed service
 ├── Dockerfile
 ├── docker-compose.yml       # Local dev only
 └── requirements.txt
