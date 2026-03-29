@@ -49,7 +49,7 @@ Originality.AI addresses trust and authenticity of text content:
 
 ### Methods
 
-In-house supervised model (elements of NLP + deep learning):
+In-house supervised model (elements of NLP + deep learning).
 
 ### Quality Measures
 
@@ -58,5 +58,29 @@ In-house supervised model (elements of NLP + deep learning):
 
 
 ![Originality.ai UI](images/originalityai_ui.png)
+
+
+<!-- --------------------------------------------------------------------------- -->
+
+## GLTR
+
+### Addressed Problems
+
+GLTR focuses on AI text detection:
+
+- Distinguishing human-written vs AI-generated text
+
+### Methods
+
+GPT-2-based model for predicting probabilities of words as it traces text.
+
+### Quality Measures
+
+- Human-in-the-loop Accuracy: One of the biggest findings in the GLTR
+  paper was that humans are bad at spotting AI text alone,
+  but their accuracy jumped from 54% to 72%
+
+- ROC AUC
+
 
 
