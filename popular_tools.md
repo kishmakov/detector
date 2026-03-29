@@ -2,7 +2,7 @@
 
 ## GPTZero
 
-### Problems
+### Addressed Problems
 
 GPTZero addresses the authorship attribution problem:
 
@@ -31,11 +31,32 @@ More specifically it is based on supervised model (elements of NLP + deep learni
 While good for AI text detection, it has very hight false-positive rate on
 human texts: [paper](https://arxiv.org/pdf/2506.23517)
 
-
 ### UI Idea
 
 ![GPTZero UI](images/gptzerome_ui.png)
 
+<!-- --------------------------------------------------------------------------- -->
+
+## Originality.AI
+
+### Addressed Problems
+
+Originality.AI addresses trust and authenticity of text content:
+
+- Distinguishing human-written vs AI-generated text
+- Detecting partial AI assistance
+- Plagiarism + factual reliability
+
+### Methods
+
+In-house supervised model (elements of NLP + deep learning):
+
+### Quality Measures
+
+- In-house metrics
+- RAID benchmark
 
 
-### Originality.AI
+![Originality.ai UI](images/originalityai_ui.png)
+
+
