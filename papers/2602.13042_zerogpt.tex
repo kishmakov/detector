@@ -1,0 +1,1064 @@
+% This must be in the first 5 lines to tell arXiv to use pdfLaTeX, which is strongly recommended.
+\pdfoutput=1
+% In particular, the hyperref package requires pdfLaTeX in order to break URLs across lines.
+
+\documentclass[11pt]{article}
+
+% Change "review" to "final" to generate the final (sometimes called camera-ready) version.
+% Change to "preprint" to generate a non-anonymous version with page numbers.
+\usepackage[final]{acl}
+ 
+% Standard package includes
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{booktabs}
+\usepackage{subcaption}
+\usepackage{tabularx}
+\usepackage{hyperref}
+
+
+% For proper rendering and hyphenation of words containing Latin characters (including in bib files)
+\usepackage[T1]{fontenc}
+% For Vietnamese characters
+% \usepackage[T5]{fontenc}
+% See https://www.latex-project.org/help/documentation/encguide.pdf for other character sets
+
+% This assumes your files are encoded as UTF8
+\usepackage[utf8]{inputenc}
+
+% This is not strictly necessary, and may be commented out,
+% but it will improve the layout of the manuscript,
+% and will typically save some space.
+\usepackage{microtype}
+
+% This is also not strictly necessary, and may be commented out.
+% However, it will improve the aesthetics of text in
+% the typewriter font.
+\usepackage{inconsolata}
+
+%Including images in your LaTeX document requires adding
+%additional package(s)
+\usepackage{graphicx}
+
+%Strikeout
+\usepackage[normalem]{ulem}
+
+% If the title and author information does not fit in the area allocated, uncomment the following
+%
+%\setlength\titlebox{<dim>}
+%
+% and set <dim> to something 5cm or larger.
+
+
+\newcommand{\alexc}[1]{{\color{red}{AC: #1}}}
+\newcommand{\alexa}[1]{{\color{blue}{AA: #1}}}
+\newcommand{\lee}[1]{{\color{purple}{DL: #1}}}
+\newcommand{\eth}[1]{{\color{brown}{ET: #1}}}
+
+
+\newcommand{\english}{\texttt{english}}
+\newcommand{\multilingual}{\texttt{multilingual}}
+\newcommand{\doc}{\mathrm{doc}}
+\newcommand{\sent}{\mathrm{sent}}
+\newcommand{\ai}{\mathrm{AI}}
+\newcommand{\human}{\mathrm{Human}}
+\newcommand{\mixed}{\mathrm{Mixed}}
+\newcommand{\agg}{\mathrm{agg}}
+\newcommand{\concat}{\mathrm{concat}}
+\newcommand{\auc}{\texttt{AUC}}
+\newcommand{\recall}{\texttt{Recall}}
+\newcommand{\accuracy}{\texttt{Accuracy}}
+\newcommand{\recallatone}{\texttt{R@FPR=1\%}}
+\newcommand{\accuracyatone}{\texttt{Acc@FPR=1\%}}
+
+\newcommand{\chatgptdetector}{ChatGPTDetector}
+\newcommand{\ghostbuster}{Ghostbuster}
+\newcommand{\binoculars}{Binoculars}
+\newcommand{\fastdetectgpt}{FastDetectGPT}
+\newcommand{\perplexity}{Perplexity}
+\newcommand{\originality}{Originality}
+\newcommand{\copyleaks}{Copyleaks}
+\newcommand{\pangram}{Pangram}
+\newcommand{\gptzero}{GPTZero}
+\newcommand{\company}{GPTZero}
+\newcommand{\radar}{Radar}
+\newcommand{\hellosimple}{HC3}
+
+\newcommand{\mixednormal}{\texttt{with mixed}}
+\newcommand{\mixedasai}{\texttt{mixed labeled ai}}
+\newcommand{\mixedasmajority}{\texttt{mixed labeled majority}}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+
+\title{\gptzero: Robust Detection of LLM-Generated Texts}
+
+
+% Author information can be set in various styles:
+% For several authors from the same institution:
+% \author{Author 1 \and ... \and Author n \\
+%         Address line \\ ... \\ Address line}
+% if the names do not fit well on one line use
+%         Author 1 \\ {\bf Author 2} \\ ... \\ {\bf Author n} \\
+% For authors from different institutions:
+% \author{Author 1 \\ Address line \\  ... \\ Address line
+%         \And  ... \And
+%         Author n \\ Address line \\ ... \\ Address line}
+% To start a separate ``row'' of authors use \AND, as in
+% \author{Author 1 \\ Address line \\  ... \\ Address line
+%         \AND
+%         Author 2 \\ Address line \\ ... \\ Address line \And
+%         Author 3 \\ Address line \\ ... \\ Address line}
+
+% \author{George Alexandru Adam \\
+%   GPTZero \\
+%   \texttt{alex.adam@gptzero.me} \\\And
+%   Alexander Cui \\
+%   GPTZero \\
+%   \texttt{alex@gptzero.me} \\\And
+%   Edward Tian \\
+%   GPTZero
+  
+%  \small{
+%    \textbf{Correspondence:} \href{mailto:alex@gptzero.me}{alex@gptzero.me}
+%  }
+%   }
+
+\author{
+ \textbf{George Alexandru Adam}*\textsuperscript{1},
+ \textbf{Alexander Cui}*\textsuperscript{1},
+ \textbf{Edwin Thomas}\textsuperscript{1},
+ \textbf{Emily Napier}\textsuperscript{1},
+ \textbf{Nazar Shmatko}\textsuperscript{1},
+\\
+ \textbf{Jacob Schnell}\textsuperscript{3,\dag},
+ \textbf{Jacob Junqi Tian}\textsuperscript{4,5,\dag},
+ \textbf{Alekhya Dronavalli}\textsuperscript{\dag},
+ \textbf{Edward Tian}\textsuperscript{1},
+ \textbf{Dongwon Lee}\textsuperscript{1,2}
+\\
+\\
+ \textsuperscript{1}GPTZero,
+ \textsuperscript{2}Pennsylvania State University
+ \textsuperscript{3}University of Waterloo
+ \textsuperscript{4}Vector Institute
+ \textsuperscript{5}Mila
+\\
+ \small{
+   \textbf{Correspondence:} \href{mailto:email@domain}{alex.adam@gptzero.me}
+ }
+}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+While historical considerations surrounding text authenticity revolved primarily around plagiarism, the advent of large language models (LLMs) has introduced a new challenge: distinguishing human-authored from AI-generated text. 
+This shift raises significant concerns, including the undermining of skill evaluations, the mass-production of low-quality content, and the proliferation of misinformation. 
+Addressing these issues, we introduce {\bf {\gptzero}}
+a state-of-the-art industrial AI detection solution, offering reliable discernment between human and LLM-generated text. 
+Our key contributions include: introducing a hierarchical, multi-task architecture enabling a flexible taxonomy of human and AI texts, demonstrating state-of-the-art accuracy on a variety of domains with granular predictions, and achieving superior robustness to adversarial attacks and paraphrasing via multi-tiered automated red teaming.
+\gptzero{} offers accurate and explainable detection, and educates users on its responsible use, ensuring fair and transparent assessment of text.
+\end{abstract}
+
+
+% Add the note at the bottom of the page
+\begingroup
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+\footnotetext[1]{Denotes equal contribution.}
+\footnotetext[2]{Work done while at \gptzero.}
+\endgroup
+
+\section{Introduction}
+Text is the most ubiquitous medium for representing and communicating information, being used for millennia to circulate ideas in academic, business, and entertainment settings. 
+% Essays, blog posts, news articles, technical reports, and books are among the most popular realizations of text into a format whose structure is targeted towards a particular audience. 
+The primary concern on the authenticity of human-written text has typically been plagiarism \cite{Randall2001-dw}, but the widespread use of large language models (LLMs) now raises a question of whether a text is truly human-authored or written by an algorithm \cite{Padillah2024-js}.
+
+% [EXPLAIN WHY THIS IS CONCERNING HERE]
+% \begin{enumerate}
+%     \item Evaluating skills and knowledge
+%     \item Decreased content quality
+%     \item Spread of convincing spam/misinformation
+% \lee{This paper (https://journalqd.org/article/view/5848) can be cited--it shows a case study about a Twitter botnet that employs ChatGPT to generate human-like content.}
+% \end{enumerate}
+
+Among the issues posed by the widespread access to AI text-generators is the undermining of assessments, where individuals may utilize LLMs to misrepresent their skills and knowledge, resulting in worthless certifications and unfounded hiring decisions.
+% The proliferation of AI-generated text poses major risks for many institutions and companies, including undermining the ability to evaluate an individual's skills and knowledge, resulting in meaningless certification and sub-optimal hiring decisions.
+% \alexc{Add sources to papers (by HBS on AI and learning), as well as sources showing the prevalence of AI in commercial reviews, and peer revew}
+% Publishing companies have also been affected by the emergence of AI-generated scam content, where poor quality biographies full of factual mistakes are released immediately upon the deaths of famous individuals \cite{Harris2024-rm}, harming the reputation of its distributors. 
+% Such content has a negative impact on the reputation of distributors and, moreover, harms the long-term trajectory of AI model development which relies on the availability of high-quality data \cite{penedo2024finewebdatasetsdecantingweb}. 
+The proliferation of unintentionally AI-generated content in training corpuses has a harmful effect on LLM performance \cite{penedo2024finewebdatasetsdecantingweb}.
+% , and models trained using AI-generated content have demonstrated worse performance on various tasks \cite{Shumailov2023-wt}.
+Lastly, AI text generators pose significant societal harm, whereby malicious actors can spread misinformation \cite{Yang2024-pz, maung24} or overwhelm academic journals with excessive low-quality submissions \cite{Liang2024-iu, Latona2024-lw}.
+% For these reasons, it is critical to develop robust tools to detect AI-generated texts and limit the adverse effects of LLMs.
+
+\begin{figure}%[h!]
+\centering
+\includegraphics[scale=0.4]{figures/figure1_large_font.pdf}
+\caption{The process of developing and improving our deep learning model for detecting LLM-generated texts.
+% \lee{this is nice but takes too much space--can we re-draw it to fit only one column width?}
+}
+\label{figure:overall}
+\end{figure}
+
+
+
+\gptzero{}'s mission is to ensure that human-written and LLM-generated text can be distinguished by anyone. 
+We achieve this by offering an AI detector that is highly accurate, robust, and explainable. Existing commercial solutions are opaque, and do not explain the sentences and corresponding features driving a given prediction. This leaves users confused and distrustful of the black-box predictions. We address this limitation through our features focused on interpretability.
+An overview of our approach is shown in Figure \ref{figure:overall}. 
+
+Our contributions are:
+%\begin{enumerate}
+    (1) We present a novel use of a hierarchical, multi-task classification architecture for AI detection enabling a flexible, fine-grained taxonomy of human texts, AI texts, and combinations thereof. 
+    (2) We demonstrate superior robustness to adversarial attacks and paraphrasers achieved via a multi-tiered red teaming approach
+    (3) We present state-of-the-art detection results on multiple domains and languages for the most recent LLMs compared to multiple open and closed-source competitors
+%\end{enumerate}
+
+
+
+\section{Related Work}
+\label{sec:related}
+% Following the development and release of increasingly sophisticated models such as GPT-3, ChatGPT, GPT-4, Claude, Gemini, and T5 \cite{Brown2020-kg, OpenAI2023-nn, Gemini_Team2023-ks, Raffel2019-re}, it has become challenging for humans to identify if text was generated by an LLM \cite{Uchendu2023-zj}.
+% This difficulty has sparked growing interest in automated AI detection solutions, and such detectors have primarily been categorized into statistical/metric-based approaches and training-based approaches. 
+
+%\subsection{Statistical/Metric Based Detection}
+{\bf Statistical/Metric Based Detection}. A principled way of testing if a text was generated by an LLM is to evaluate the likelihood of that text under a statistical model which serves as a proxy \cite{Su2023-de}. 
+Several variations on this approach have emerged, including computing the average rank of the text's words in the output distribution of an LLM \cite{Su2023-de}, computing the perplexity of the LLM on the text, or even token cohesiveness \cite{Ma2024-wz}.
+GPT-who takes a similar approach by deriving multiple likelihood-based features capturing surprisal \cite{Venkatraman2023-pe}. 
+DetectGPT proposes repeatedly replacing words in a text with LLM-suggested alternatives \cite{Mitchell2023-qb}, hypothesizing that these perturbations will more significantly change an LLM's log-probs for human-written texts than for AI-written texts. 
+Fast-DetectGPT improves on this idea by only calling the LLM once and factorizing the perturbation effects to improve computational efficiency \cite{Bao2023-ay}. 
+Lastly, Binoculars uses two LLMs to compute a cross-perplexity score based on agreement between LLMs \cite{Hans2024-qb}.
+
+%\subsection{Training-Based Detection}
+{\bf Training-Based Detection}.
+%Training a model to detect LLM-generated text removes the need for hand-crafted heuristics and statistical models while allowing for adaptation to new domains. 
+\cite{Islam2023-uj} showed limited success using classical models such as logistic regression, SVMs \cite{Hearst1998-ty}, and neural networks \cite{Hochreiter1997-gp} using word frequency features as inputs. 
+% These approaches had limited success, however, suggesting that a word frequency representation lacking word positional information is insufficient. 
+Conversely, using embeddings from small language models, like RoBERTa, has proven to be effective at detecting AI-generated tweets \cite{Kumarage2023-db}. 
+Unsupervised contrastive learning has also shown promise in disentangling human-authored from AI-generated text, while identifying features which generalize to new LLMs \cite{Bhattacharjee2023-yv, Zhang2024-di}. The positive unlabeled learning framework can also be used to learn from large amounts of unlabeled text \cite{Tian2023-ui}.
+Ghostbuster \cite{Verma2023-ti} trains a shallow classifier on hand-crafted features based on LLM log-probs to achieve strong generalization results. 
+Even within the same domain, more advanced text generation approaches such as using a finetuned domain-specific LLM can make detection more challenging for both deep learning and statistical approaches \cite{Dawkins2025-cg}.
+The primary limitation of trained AI-generated text detectors is the demanding need for diverse data, without which, generalization to new domains and LLMs is limited \cite{Dugan2024-qu}.
+Lastly, deep learning methods have been shown to be effective at making fine-grained predictions at the token-level, capturing human edits of LLM texts \cite{Kadiyala2025-kc, Artemova2024-jh, Pham2025-fe}
+
+
+\section{The \gptzero{} Detector}
+% \lee{Add an overall architecture figure showing how \gptzero{} works, with each component numbered, then in the description in Sec 2, refer to the number in Figure in describing corresponding component. For instance: data collection/generation, training, inference, user-interface component, etc}
+
+% \lee{In addition, what's novel feature of \gptzero{}, compared to competitors or existing papers? To seel the paper better, describinh such novel aspects a bit would be better.}
+
+
+%We describe the principal components of our system in relation to detection accuracy and user needs below.
+\subsection{Data}
+
+%\lee{is it possible to show a table with the summary statistics of \gptzero{}'s major datasets?}
+
+%Our detector's performance improves substantially with the scale and diversity of the data used to train it since it is based on a deep learning architecture. 
+As \gptzero{} uses a deep learning architecture, its performance is proportional to the scale and diversity of the data on which it was trained (see Appendix Table \ref{table:training_data_stats} for an overview of our training dataset).
+% Prior work has similarly demonstrated that training-based AI text detectors require data from diverse text domains to achieve good generalization performance \cite{Xu2023-zv}.
+% Having a comprehensive evaluation dataset is also crucial for estimating in-the-wild error rates \cite{Koh2020-dd} which we use to inform users of the reliability our detector \cite{Bansal2019-ox}. 
+
+\textbf{Data Acquisition}. Our data gathering pipeline, shown in the first step of Figure \ref{figure:overall}, involves regularly collecting publicly available datasets of both human-written and AI-written text.
+We additionally use a proprietary generation pipeline using various prompting strategies to generate texts from popular LLM providers such as OpenAI, Anthropic, Google, and open-source LLMs.  
+
+% \begingroup
+% \renewcommand{\thefootnote}{\fnsymbol{footnote}}
+% \footnotetext[1]{Data available at anonymized repo \url{https://github.com/nlpiskey/emnlp_2025_submission}}
+% \endgroup
+
+
+\textbf{Data Cleaning and QA}. Data-driven detectors can be prone to learning biases in the data that help distinguish human and AI text, such as text formatting.
+Appendix Table \ref{table:dataset_bias} illustrates some common such biases that must be addressed prior to training to avoid relying on spurious correlations.
+We employ both statistical methods and manual inspection datasets to uncover and address issues. 
+
+% \begin{table}[h!]
+%     \centering
+%     \begin{tabular}{llll}
+%         \toprule
+%         Dataset & Example & Label & Issue \\
+%         \midrule
+%         HC3 Plus & Google is doing well , but they are definitely not untouchable . Part of the problem with having the halo that Google currently does is that the current stock price is based on very , very high expectations . & Human & Issue1 \\
+%         HC3 Plus & There are several factors that can contribute to the value of a share of stock in a company. These include the financial performance and prospects of the company, the strength of its management and leadership, the stability and growth potential of its industry, and the overall state of the economy. & AI & Issue2 \\
+%         Scientific Papers & many lepidopteran insects are agricultural pests that affect stored grains , food and fiber crops . these insects have negative ecological and economic impacts since they lower crop yield , and pesticides are expensive and can have off - target effects on beneficial arthropods .  & Human & Issue3 \\
+%         Scientific Papers & The sine-Gordon field theory and its associated massive Thirring model are quantum field theories that have been extensively studied by researchers. These theories have provided valuable insights and have led to the discovery of important exact results. & AI & Issue4 \\
+%         \bottomrule
+%     \end{tabular}
+%     \caption{Example table using booktabs}
+%     \label{tab:example}
+% \end{table}
+
+
+
+
+\textbf{User Feedback Loop}. To help focus our data gathering and generation efforts, we implement a user feedback mechanism where users can dispute predictions they believe to be incorrect (see Appendix Figure \ref{figure:user_feedback}). 
+Clustering documents with such feedback enables us to identify the most relevant and underrepresented domains and common failure cases, which is used to scope our future data collection and training efforts.
+% and identify common failure cases, which we use to scope our future data collection and training efforts.
+% This leads to more targeted data gathering efforts as we can perform analysis to see if there are obvious clusters of documents having incorrect predictions. 
+
+% Moreover, we evaluate \gptzero{} on historical user submissions and track the evolution of the detector's predictions with newer model versions to check for regressions \cite{Lipton2018-ei}.
+
+\subsection{Modeling}
+The \gptzero{} detector uses a deep learning architecture trained in a supervised fashion, selected for its superior in-distribution performance compared to zero-shot and metric-based models \cite{Lai2024-eh, Tulchinskii2023-mb}. 
+A key distinction we make compared to other commercial detectors is in framing AI-generated text detection as a ternary classification problem consisting of Human, AI, and Mixed classes. While this has been framed as a ternary problem in previous research \cite{Zeng2024-qc,Richburg2024-al} , in practice most open sources methods and commercial detectors do not leverage this paradigm.
+% \lee{In earlier submissions, we got attacked on this ternary part, so we may tone it down this time and treat this as just a different approach? Also, it's unclear how this ternary idea connects with the XBoost-feature based explanation idea in Sec 7 which is in the binary setting and shows only 90\% accuracy}
+% Approximately 10\% of our user-submitted documents are a mix of human and AI text. Some examples include lab reports where instructions are interleaved with LLM responses, as well as documents where users leverage LLMs in a limited amount of sections, perhaps due to limited time/interest in those sections.
+% A document is said to be mixed if less than 90\% of the text is human-written and less than 90\% of the text is AI-generated, regardless of the order of the human-written and AI-generated segments. 
+We use a hierarchical classification head with classes Human, AI, and Mixed at the top level (L0), with finer grained classes Pure AI, Polished (Human written and then AI polished), and AI Paraphrased (AI written and then AI rephrased) under the AI class (L1) as shown in Figure \ref{figure:hier_overall}. 
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.7]{figures/hierarchical_class_final.png}
+\caption{Hierarchical Classifier Heads
+}
+\label{figure:hier_overall}
+\end{figure}
+
+One advantage this gives us is better sample efficiency for classes with fewer samples such as the AI Paraphrased class, and falling back to the more reliable parent class for low confidence subclass predictions. This novel hierarchical framing of AI detection allows us to communicate to our users the degree to which LLMs were used which is vital in the context of academic integrity. Additionally, the Mixed class allows us to decouple model confidence and the proportion of the text generated by an AI. This resolves the confusing ambiguity of binary classifiers, where a 50\% AI-generated score could either mean the detector is 100\% confident that 50\% of the text is AI-generated, or that the detector is 50\% confident that the document is entirely AI-generated.
+
+By representing a document as a sequence of $n$ sentences $d = (s_{1}, ..., s_{n})$, we enable fine-grained predictions for documents that are a mix of human and AI text.
+In particular, \gptzero{} produces both document-level predictions, $f_{\doc}(d) = (p_{\human}, p_{\ai}, p_{\mixed})$, as well as predictions for each sentence individually, $f_{\sent}(d) = (p_{\ai}^{(1)}, ..., p_{\ai}^{(n)})$.
+To enable these sentence-level predictions, we adopt a multi-task loss $\mathcal{L} = \mathcal{L}_{d} + \alpha \mathcal{L}_{s}$ where $\mathcal{L}_{d}$ is the document-level cross-entropy loss, $\mathcal{L}_{s}$ is the sentence-level binary cross-entropy loss, and $\alpha$ is a hyperparameter trading-off the two. 
+We frame sentence-level predictions as a binary classification problem due to the lack of a well-defined criteria for what mixed sentences are. 
+By training our detector with this multi-task objective, \gptzero{} efficiently produces both document and sentence-level predictions in a single forward pass.
+These predictions provide significantly finer-grain and more explainable detections over competing detectors discussed in Sec. \ref{sec:related} which only predict a binary document-level prediction, with no principled way of representing mixed documents.
+% During training, we form documents by randomly sampling a sequence of consecutive sentences, such that the document fits within our model's context length, $T$.
+% In particular, a training document $\operatorname{Sample}(d, T)=(s_i, s_{i+1},\ldots, s_j)$ will satisfy $1\le i\le j\le n$ and $\sum_{k=i}^j|s_k|\le T$.
+% This construction avoids long documents disproportionately affecting training compared to shorter documents. 
+Architecture and hyperparameters are proprietary.
+
+\subsection{Classification of Polished Texts}
+\label{sec:polished_method}
+We define a Polished text as a human document that has been processed by an LLM to improve grammar, spelling, formatting, clarity, etc. via a prompt such as that in Appendix Section \ref{appendix:polishing_prompts}. Formally, given a human document $d_{\text{Human}}$, a polished text  is defined as $d_{\text{Polished}} = \mathcal{F}_{\text{Polish}}(d_{\text{Human}})$ where $\mathcal{F}_{\text{Polish}}$ is an LLM with a single prompt in its context that has a polishing instruction.
+
+Additionally, we use the following comparison to determine if the text should be included in the dataset of Polished texts or if it should be discarded: $keep = \tau_{\text{min}} \leq sim(d_{\text{Human}}, d_{\text{Polished}}) \leq \tau_{\text{max}}$ where $\text{sim}$ is a similarity metric, $d_{\text{Human}}$ is the human document, $d_{\text{Polished}}$ is the polished document, $\tau_{\text{min}}$ is tuned to ensure that $d_{\text{Polished}}$ is not so different from the original human text that it could be obtained by prompting an LLM without access to $d_{\text{Human}}$ as reference, and $\tau_{\text{max}}$ ensures that sufficient edits were made to $d_{\text{Human}}$ to minimize risk of misclassifying human texts as polished. In practice, we use the Levenshtein Ratio for $sim$ as embedding-based similarity metrics like cosine similarity often fail to capture stylistic differences between texts.
+
+
+
+\subsection{Adversarial Robustness}
+Many advanced users attempt to undermine AI detectors by editing an LLM-generated text prior to finalizing their document. This process is often referred to as paraphrasing or humanization in the literature \cite{Zhou2024-ud,Zheng2025-lq} and covers a broad set of techniques. Our approach to adversarial robustness involves addressing the following 4 threat models in order of increasing severity: Paraprhrasing Prompts, Paraphrasing Models (e.g. Dipper), Black-Box Humanization Services, White-Box Attacks. We use data augmentation to increase robustness to these threats by transforming the AI texts in our dataset using these techniques.
+
+\begin{figure}%[h!]
+\centering
+\includegraphics[width=0.95\columnwidth]{figures/multi_tiered_red_teaming.png}
+\caption{GPTZero's multi-tiered red teaming approach covers a variety of adversarial threats, providing unprecedented robustness. 
+% \lee{this is nice but takes too much space--can we re-draw it to fit only one column width?}
+}
+\label{figure:multi_tiered_red_teaming}
+\end{figure}
+
+\subsubsection{Paraphrasing Prompts}
+The simplest approach to evading AI detection is to prompt the same LLM that generated the text in question to remove vocabulary or punctuation that is common in AI generated text. Inspired by research on LLM watermark removal via translation by \cite{He2024-ox}, we also employ multi-turn prompting strategies, alternating between a paraphrasing prompt, and translation for a chain of up to 4 languages as follows. Let $\mathcal{L} = \{\ell_{1}, \ell_{2}, ..., \ell_{k}\}$ be the sequence of target languages where $k \leq 4$. The following sequence of paraphrased $d_{t}$ is define for $t = 1, ..., 2k$
+
+\begin{align*}
+    d_{t} = \begin{cases}
+        \mathcal{F}_{\text{Para}}(d_{t-1}) & \text{if } t \bmod 2 = 1 \\
+        \mathcal{F}_{\text{Trans}}(d_{t-1}, \ell_{k}) & \!\begin{aligned}[t] 
+                                            & \text{if } t \bmod 2 == 0 \\ 
+                                            & \text{where } k = t/2 
+                                          \end{aligned}
+    \end{cases}
+\end{align*}
+
+where $\mathcal{F}_{\text{Para}}$ and $\mathcal{F}_{\text{Trans}}$ are a given LLM prompted for paraphrasing and translation respectively.
+
+
+\subsubsection{Paraphraser Models}
+A seminal paraphrasing model called Dipper initially had a high bypass rate against our detector \cite{krishna2023paraphrasing}. Dipper was trained to transform translated versions of English novels back to their English equivalent at the paragraph level. This is a fundamentally different objective than language modeling, resulting in texts that are semantically similar to the original version, but different in vocabulary and sentence structure. Similarly, TempParaphraser uses a paraphrasing model to simulate the randomness that LLMs exhibit for higher temperature settings when sampling, but does so without sacrificing generation quality.
+
+We generate $\alpha N_{AI}$ Dipper texts, and $\beta N_{AI}$ TempParaphraser texts for LLM texts sampled uniformly at random from our training database where $\alpha, \beta \in [0, 1]$. 
+In practice $\alpha$ and $\beta$ are proprietary, and vary between model releases.
+
+\subsubsection{Black-Box Paraphraser Services}
+Black-box paraphraser services are particularly challenging to defend against since the mechanism for generating the bypassed texts is unknown, allowing for combinations of operations such as: providing few-shot examples of a human writer's style, fine-tuning LLMs for humanization, and even concatenating together semantically similar sentences from a human text database \cite{Chakrabarty2025-ke, Pham2025-fe}. It is impractical to implement all possible approaches, so we instead leverage a limited amount of data from the paraphrasing services listed in Appendix Section \ref{appendix:paraphraser_services}. In particular, we fine-tune our model on these challenging examples along with the white-box attack texts described in the next section.
+
+\subsubsection{White-Box Adversarial Attacks}
+The most extreme attack scenario against any machine learning model is white-box adversarial attacks which assume access to model weights and architecture. The discrete nature of text-generation requires approximations to be made as direct gradient-based optimization on a seed text is not tractable. We thus use the approach by \cite{Zhou2024-ud} 
+\begin{equation}
+\begin{aligned}
+& \underset{d_{\text{Adv}}}{\text{minimize}}
+& & f_{\text{doc}}(d_{\text{Adv}}) \\
+& \text{subject to}
+& & d_{\text{Adv}} \in \mathcal{M}(d_{\text{Init}}, \mathcal{R}) \\
+& & & C_j(d) = 1, \quad \forall j \in \{1, \dots, K\}
+\end{aligned}
+\end{equation}
+
+where $f_{\text{doc}}$ is the document-level output for the AI class of our detector, $d_{\text{Init}}$ is the initial document that is being attacked, 
+$d_{\text{Adv}}$ is the adversarial document being generated, $\mathcal{M}(d_{\text{Init}}, \mathcal{R})$ is the set of all texts that can be generated by swapping words from $d_{\text{Init}}$ with alternatives provided by the ranker model $\mathcal{R}$. In practice, we use the gradients of our detector to choose the most important input tokens, and perform substitution with  masked language model such as RoBERTa, under the constraint that that perplexity should not increase significantly in order to maintain fluency.
+
+\subsection{Inference}
+% \alexa{Can discuss windowing for long documents, prediction aggregation, output mapping, quantization,}
+To ensure \gptzero{}'s robustness and consistency, we apply basic cleaning and reformatting to the document before inference, such as removing extraneous whitespace.
+If a document, $d$, does not fit in the detector's context length, we split it into disjoint windows $W_1,\ldots,W_m$ such that $d=\concat(W_1,\ldots,W_m)$ and $|W_i|\le T$ for ${i=1,\ldots,m}$.
+% During inference, we use a sliding window approach for evaluating documents which do not fit into our detector's context length $T$ 
+% \alexc{lets not mention how we chunk the document in this paper, as it's not super critical / something i want to keep secret}. 
+We recover a document-level prediction by
+%\begin{equation*} 
+$f_{\doc}(d) = \agg(f_{\doc}(W_{1}), ..., f_{\doc}(W_{m}))$
+%\end{equation*}
+and sentence-level predictions by
+%\begin{equation*} 
+$f_{\sent}(d) = \concat(f_{\sent}(W_{1}), ..., f_{\sent}(W_{m}))$,
+%\end{equation*}
+% \lee{How O\_doc and O\_sent get connected?}
+for some aggregate $\agg$ (e.g., average, median, maximum).
+
+Finally, we leverage a remapping function ${r: \mathbb{R}^3 \rightarrow \mathbb{R}^3}$ to produce our overall document-level predictions $r(f_\doc(d))$.
+This post-processing improves calibration and reduces false-positive predictions (Appendix Sec. \ref{sec:calibration}). 
+
+
+
+\section{Deep Scan}
+\label{sec:appendix_deep_scan}
+One of our contributions is providing an unprecedented level of transparency to our users via our feature \textit{Deep Scan}. \textit{Deep Scan} is a proprietary method for attributing the document-level prediction of our detector to the sentences that have the largest impact on the prediction (Appendix Figure \ref{fig:deep_scan}). 
+Specifically, for each sentence $s_k$ in $d=(s_1,\ldots,s_n)$, Deep Scan assigns a score $\delta_k$ indicating how the presence of $s_k$ affects $P(y = \mathrm{AI} \,|\, d)$. 
+These scores complement the sentence-level probabilities predicted by our detector since those probabilities do not provide the relative importance of each sentence. 
+\textit{Deep Scan} is an adaptation of two methods: Saliency and Occlusion \cite{Atanasova2020-uz}. We use saliency to identify the tokens that would most affect the output of the predicted class if changed. Based on user submissions, we observe that writers mainly replace some words with their synonyms, or remove them altogether. We mimic this behavior to identify how our model's predictions would change in a way that is aligned with user edit behavior. 
+% Our proprietary innovation focuses on how to aggregate these scores in such a way that balances explaining what our model focuses on, but prevents the risk of users exploiting this information to adversarially attack it.
+
+
+
+
+
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.9\columnwidth]{figures/update_shapely_plot_resized.png}
+% \includegraphics[scale=0.4]{figures/nl_corrections.png}
+\caption{Drops in AI probability after removing top-k\% of high AI impact sentences predicted by our DeepScan Feature (Blue) and Detector Sentence Head (Orange)
+% \lee{this is nice but takes too much space--can we re-draw it to fit only one column width?}
+}
+\label{figure:adv_scan_faithfulness}
+\end{figure}
+
+Figure \ref{figure:adv_scan_faithfulness} shows the drops in AI probability after removing top 5\% to top-50\% of the sentences that have the largest impact on AI scores. The dataset used here consists of 100 documents across a variety of domains. This confirms the faithfulness of deep scan and its ability to identify the most important sentences. 
+
+\section{Case Studies}
+In this section, we demonstrate the performance of our detector against commercial and open-source competitors on some cases of interest. 
+Data and model outputs are available in our repository.\footnote{
+Anonymized Github repository
+Placeholder.
+}
+Dataset details are found in Appendix \ref{sec:case_study_dataset_details}.
+
+%\subsection{Metrics}
+\textbf{Open-Source Evaluation Metrics}:
+Our evaluation metrics include \auc{} for threshold-free comparisons, and \recall{} and \accuracy{} to compare models at the threshold of a 1\% false-positive rate.
+This strict threshold was selected since false-positives have a serious negative impact on writers. 
+
+\textbf{Closed-Source Evaluation Metrics}:
+For competitors which have multi-class outputs, we sum the probabilities of the non-human classes to obtain an overall AI probability. This is then used to compute \auc{}. Since the closed-source competitors provide a final classification that is presented to users via a UI based on internal thresholds, we use this as the final prediction for both \gptzero{} and closed source competitors.
+
+%\subsection{Baselines}
+We consider the following baselines:
+(1) \textbf{Radar} uses a deep learning model trained adversarially \cite{Hu2023-uv},
+(2) \textbf{Fast-DetectGPT} is a zero-shot approach for detecting LLM-generated texts based on a heuristic that modified versions of an LLM-generated text should have consistently lower probability than the original version, formalized by using conditional probability curvature \cite{Bao2023-ay},
+(3) 
+\textbf{Binoculars}
+ uses two LLMs to compute a cross-perplexity score which is meant to account for tokens that are unlikely unless a highly specific prompt is used \cite{Hans2024-qb},
+(4)
+\textbf{\hellosimple} 
+ uses a RoBERTa architecture trained on ChatGPT texts and specializes in short text detection \cite{Guo2023-gu}
+(5)
+\textbf{Originality (lite-102 for English texts, multilang for non-English texts)}
+ is a commercial detector specializing in marketing and web content \cite{noauthor_undated-gd}, and
+(6)
+\textbf{Pangram (3.1 for English texts, 2.0 for non-English texts)}
+ is a commercial detector that prioritizes precision from a plagiarism detection company \cite{Emi2024-nq}.
+
+\begin{table*}
+\centering
+\resizebox{0.85\textwidth}{!}{%
+    \begin{tabular}{lccccccccc} % Adjusted to match the number of columns in the data rows
+    \toprule
+         & \multicolumn{3}{c}{\textbf{Abstracts}} 
+         & \multicolumn{3}{c}{\textbf{Creative Writing}} 
+         & \multicolumn{3}{c}{\textbf{Essays}} \\
+    \cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10}
+    \textbf{Detector} & \auc & \accuracy & \recall 
+                      & \auc & \accuracy & \recall 
+                      & \auc & \accuracy & \recall \\
+    \midrule
+    \hellosimple     & 64.5    & 52.55    & 6.1  
+                     & 49.3    & 49.6    & 0.0
+                     & 25.6    & 49.6    & 0.0  
+                 \\[1mm]
+                 
+    \radar       & 15.8    & 49.5    & 0.0
+                 & 56.9    & 49.5    & 0.0  
+                 & 51.8    & 51.1    & 3.3
+                 \\[1mm]
+                 
+    \fastdetectgpt  & 52.6    & 51.6    & 4.4
+                    & 73.8    & 60.3    & 21.6
+                    & 72.8    & 64.4    & 33.0
+             \\[1mm]
+             
+    \binoculars  & 40.0    & 49.5    & 0.0
+                 & 82.4    & 60.7    & 22.4
+                 & 83.5    & 70.5    & 41.9
+                 \\[1mm]
+
+    \midrule
+    \originality{} (lite-102) & 99.4    & 96.5    & 95.1  
+                 & 98.9    & 95.8    & 92.1
+                 & \textbf{99.9}    & 99.5    & 99.2
+                 \\[1mm]
+                 
+    \pangram{} (3.1)   & 92.8    & 93.6    & 87.2
+                 & 96.1    & 98.0    & 96.0
+                 & \textbf{99.9}    & \textbf{99.8}    & \textbf{99.8}
+                 \\[1mm]
+    \midrule
+    \gptzero{} (4.1b)   & \textbf{99.9} & \textbf{99.4} & \textbf{99.2}  
+                 & \textbf{99.9} & \textbf{98.7} & \textbf{97.4}  
+                 & \textbf{99.9} & \textbf{99.8} & 99.7  
+                 \\
+    \bottomrule
+    \end{tabular}%
+}
+\caption{Performance comparison across multiple domains.}
+\label{table:per_domain_performance_1}
+\end{table*}
+
+
+\begin{table*}
+\centering
+\resizebox{0.62\textwidth}{!}{%
+    \begin{tabular}{lcccccc} % 1 Detector + (2 groups * 3 metrics) = 7 columns
+    \toprule
+         & \multicolumn{3}{c}{\textbf{Paper Reviews}}
+         & \multicolumn{3}{c}{\textbf{Product Reviews}} \\
+    \cmidrule(lr){2-4} \cmidrule(lr){5-7}
+    \textbf{Detector} 
+      & \auc & \accuracy & \recall 
+      & \auc & \accuracy & \recall \\
+    \midrule
+     \hellosimple
+          & 47.0 & 49.6 & 0.0
+          & 44.4 & 49.6 & 0.0 \\[1mm]
+    \radar 
+      & 29.0 & 49.0 & 0.0
+      & 33.8 & 49.5 & 0.0  \\[1mm]
+
+    \fastdetectgpt 
+      & 42.4 & 50.9 & 2.7
+      & 41.7 & 49.9 & 0.1  \\[1mm]
+      
+    \binoculars
+      & 49.1 & 50.4 & 1.8
+      & 55.0 & 50.0 & 1.2 \\[1mm]
+
+    \midrule
+    \originality{} (lite-102)
+      & 99.6 & 96.5 & 94.9
+      & 96.4 & 90.4 & 82.6 \\[1mm]
+      
+    \pangram{} (3.1)
+      & 97.3 & 98.6 & 97.2
+      & 93.4 & 94.4 & 88.8 \\[1mm]
+    \midrule
+    \gptzero{} (4.1b)
+      & \textbf{99.9} & \textbf{99.9} & \textbf{99.7} 
+      & \textbf{99.9} & \textbf{99.2} & \textbf{98.3} \\
+    \bottomrule
+    \end{tabular}%
+}
+\caption{Performance comparison on additional domains.}
+\label{table:per_domain_performance_2}
+\end{table*}
+
+
+
+% \subsection{Formatting Robustness}
+% Deep learning architectures are able to learn very complex patterns during training, but also might rely on spurious features. Such features are challenging to manually identify, but through the insights provided by NLE, we identified two features that biased early versions of our detector towards the AI class: markdown bold formatting and bullet point lists. By inserting/removing bold formatting and lists using the NLE-inspired prompt (see Appendix \ref{sec:prompt_inspired_by_nle}) during training, we greatly improve the invariance of our model to these features as seen in Table \ref{table:augmentation_benchmark}. The benchmarks have two versions of a document: one with and one without a given formatting (see Appendix \ref{sec:formatting_benchmark_set}). MSE is the mean squared error in our detector's predicted AI probability between the two versions. 
+
+% \begin{table}[H]
+%     \centering
+%     \small
+%     % \resizebox{\0.9\textwidth}{!}{
+%     \begin{tabular}{lcccc}
+%     \toprule
+%     \textbf{Type} & \multicolumn{2}{c}{\textbf{MSE}} & \multicolumn{2}{c}{\textbf{Accuracy}} \\
+%     \cmidrule(lr){2-3} \cmidrule(lr){4-5}
+%      & W. Aug & W/O. Aug & W. Aug & W/O. Aug \\
+%     \midrule
+%     Bold & 0.0222 & 0.3062 & 0.9954 & 0.5046 \\
+%     Lists & 0.0364 & 0.2667 & 0.9757 & 0.5210 \\
+%     \bottomrule
+%     \end{tabular}
+%     % }
+%     \caption{Benchmark results for bold formatting and lists}
+%     \label{table:augmentation_benchmark}
+% \end{table}
+
+\subsection{Domain-Specific Performance}
+% Figure [blah] shows the proportion of document types submitted to our detector based on a 100000 sample subset. This demonstrates that the domains which our users suspect that AI is being used is vast. 
+% Can look at a few of the most common genres, and show how performance varies. 
+To demonstrate \gptzero{}'s generalizability, we evaluate the detectors on abstracts, creative writing, essays, paper reviews, and product reviews. All benchmarks have 1000 human and 1000 corresponding AI texts, with the AI texts being generated by the following 4 LLMs (250 texts per LLM) using multiple prompts: GPT-5.2, Gemini 3 Pro, Claude Sonnet 4.5, and Grok 4 Fast. 
+
+Tables \ref{table:per_domain_performance_1} and \ref{table:per_domain_performance_2} reveal that \gptzero{} either outperforms or matches all other detectors on all domains. In particular, the open source detectors do very poorly on scientific abstracts, paper reviews, and product reviews. These detectors were released some time ago and leverage older LLMs to compute their zero-shot heuristic scores. As a result, they rely heavily on having open-source LLMs which match the outputs of closed-source LLMs. Of the closed-source methods, \originality{} has higher recall on some domains such as abstracts and paper reviews compared to \pangram, though its false positive rate is high enough such that users would disqualify it. \gptzero{} is the only detector which consistently has a sub 1\% false positive rate across all domains while achieving a recall >97\%. For content platforms whose primary benefit for users is authentic reviews, or academic venues trying to prevent the proliferation of AI slop, a recall of <90\% as demonstrated by both \originality{} and \pangram{} would lead to an unacceptable amount of low-quality content being published.
+
+\subsection{Multilingual Detection}
+\label{section:multilingual_detection}
+Nearly 15\% of texts scanned by \gptzero{} are written in a language other than English movitating the need for comprehensive non-English evaluation. We measure the performance of \gptzero{} and closed-source competitors on non-English texts in Table \ref{table:multilingual_performance}. The dataset used here consists of  
+1100 human and 1100 corresponding AI texts across 24 languages taken from the CulturaX  and Multitude V3 datasets \cite{Nguyen2023-uc, Macko2023-dz}. \gptzero{} achieves superior accuracy due to large-scale data gathering and generation efforts where the total data volume is nearly the same as English texts, avoiding language imbalance.
+
+\begin{table}
+\centering
+\resizebox{0.85\columnwidth}{!}{%
+    \begin{tabular}{lccc} % Adjusted to match the number of columns in the data rows
+    \toprule
+    \textbf{Detector} & \auc & \accuracy & \recall \\
+    \midrule
+    \originality{} (multilang) & 98.8    & 91.5    & 97.9  \\
+                 
+    \pangram{} (2.0)   & 97.5    & 97.5    & 94.9 \\
+    
+    \midrule
+    \gptzero{} (3.7m)   & \textbf{99.9} & \textbf{98.8} & \textbf{97.6} \\
+
+    \bottomrule
+    \end{tabular}%
+}
+\caption{Performance on multilingual texts.}
+\label{table:multilingual_performance}
+\end{table}
+
+\subsection{AI Bypasser Detection}
+\label{section:ai_bypassers}
+
+AI bypassers are at the frontier of AI detection, offering sophisticated users an opportunity to humanize a text without manual intervention. This is a particularly challenging setting.
+We use a dataset of 1000 AI texts that have been modified by a variety of paraphrasing techniques and 9 dedicated bypassers services (see Appendix Section \ref{appendix:paraphraser_services} for details) to quantify accuracy in this setting \cite{krishna2023paraphrasing}. This dataset covers several domains including academic writing, scientific text, essays, social media, and creative writing. The original AI text was generated by GPT-5, GPT4o, and GPT4.1. \gptzero{} has a recall of 93.5\%, while \originality{} and \pangram{} have a recall of 57.3\% and 49.7\% respectively, demonstrating the effectiveness of our multi-tiered red teaming approach.
+
+\subsection{Polished Text Detection}
+The definition of a Polished text presented in Section \ref{sec:polished_method} is unique to \gptzero{} since competitors which offer such a service may use other thresholds and prompts. As a result, we measure \gptzero{}'s ability to detect polished texts on a larger dataset and exclude competitors from this analysis since it would be confounded by a difference in definition. We use a dataset of 4,631 polished texts across several human origin datasets. Of these, we correctly classify 4,175 as polished, and misclassify 247 as AI, 205 as human, and 4 as mixed. Figure \ref{figure:levensthein_ratio} shows the Levenshtein ratio relative to the original human text for the misclassifications where samples misclassified as AI are less similar to the human text on average, compared to samples misclassified as human.
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.2]{figures/levenshtein_ratios_hist.png}
+\caption{Levensthein ratio for polished sample misclassifications.}
+\label{figure:levensthein_ratio}
+\end{figure}
+
+
+
+
+\subsection{Mixed Class Ablation Study}
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.25]{figures/accuracy_plot.pdf}
+\caption{Accuracy of mixed class ablation models on classifying documents evaluated on internal dataset of 40k examples (details in Appendix).
+% \lee{this is nice but takes too much space--can we re-draw it to fit only one column width?}
+}
+\label{figure:mixed_ablation}
+\end{figure}
+
+We investigate the role that training on 3 classes has on model performance. We consider 3 ablations where during training samples containing both human and AI text are labeled as: AI (in the \mixedasai{} setting), the majority sentence proportion label (in the \mixedasmajority), and mixed (in the \mixednormal{} category - Ours). All 3 of these approaches achieve similar AUC ($\sim$96\%) when evaluated on purely Human/AI documents. However, forcing a ternary classification problem to be binary requires using sentence-level predictions to classify if a document contains a mix of human and AI text. The following logic is used: given the average sentence-level AI probability $p_{\mathrm{avg}} = \frac{1}{|S|} \sum_{i=1}^{|S|} p_{ai}(s_{i})$, the predicted class is
+% \[
+% f(p_{\mathrm{avg}}) =
+% \begin{cases}
+% \text{Human} & \text{if } p_{\mathrm{avg}} < 1-\tau, \\[1mm]
+% \text{Mixed} & \text{if } 1-\tau \le p_{\mathrm{avg}} \le \tau, \\[1mm]
+% \text{AI}    & \text{if } p_{\mathrm{avg}} > \tau.
+% \end{cases}
+% \]
+$f(p_{\mathrm{avg}}) = \text{Human if } p_{\mathrm{avg}} < 1-\tau; \text{Mixed if } 1-\tau \le p_{\mathrm{avg}} \le \tau; \text{AI if } p_{\mathrm{avg}} > \tau.$ for $\tau \in [0.5, 1]$
+
+Figure \ref{figure:mixed_ablation} shows that our mixed class approach is superior when considering performance on all document types (Human, AI, Mixed), with the added benefit of not having to perform a hyperparameter search for $\tau$ since we use $\argmax$ over our multiclass probabilites to classify. 
+
+
+
+
+
+
+
+
+% \alexa{\section{Limitations (Mandatory Section)}}
+\section{Conclusion}
+With a focus on meticulous data gathering, generation, and augmentation efforts, as well innovations pertaining to model training, architecture, and inference, we have achieved a state of the art commercial AI text detector. Our approach has been comprehensively evaluated on various domains, LLMs, languages, generation settings, prompts, and even possible paraphrasing, demonstrating broad applicability. The transparency provided by \gptzero{} enables users to make informed decisions about trusting content and evaluating the effort expended to generate it. 
+
+\section{Limitations}
+Our work shares some limitations with other research on AI detection. For example, a challenging and representative evaluation dataset capable of revealing model shortfalls is elusive. 
+We find that in-distribution performance metrics are overly optimistic and unable to distinguish between models with significantly different OOD performance. 
+Additionally, there is a lack of standardization regarding which datasets are used to evaluate models both in the research literature, and by commercial providers. 
+This introduces the risk of cherry-picking, and makes it challenging to determine if newly introduced methods are better than existing ones. 
+We believe a public benchmark with regular updates incorporating new LLM versions would be highly beneficial to the AI-generated text detection community as a whole \cite{Kiela2021-tx}. 
+
+Developing an accurate and scalable deep learning model for AI-generated text detection requires meticulous data engineering efforts. 
+This data engineering can be resource intensive and still result in blind spots, such as poor model generalization to lower quality LLMs like GPT-2, OPT, etc. 
+Generalization to new models is of particular importance, as the distribution of user text changes over time with the release of newer and more capable LLMs. 
+Being robust to users trying to bypass our detector also remains a priority, especially as some users incorporate paraphrasers and adversarial attacks as part of their LLM-based writing process. 
+While techniques such as adversarial training improve robustness \cite{Tramer2019-gk}, it is known to trade-off performance on in-distribution examples \cite{Raghunathan2019-jw,Hu2023-cg}. 
+
+Furthermore, our Deep Scan method cannot entirely capture human text editing patterns. As such, it is possible that the most important sentences it identifies are suboptimal. However, the experiments showing the effect of removing important sentences do support that the presence of these sentences are at least correlated with detector predictions, even if they are not necessarily causal. 
+
+
+
+
+
+% \lee{need to expand this section more significantly. maybe talk about challenges that \gptzero{} met about the detection problem, both technical and non-technical, from industrial perspective. Then, also can talk about some open issues that \gptzero{} doesn't have solutions yet but will work on. Or, some suggestions or proposals to academics.}
+
+% \section{Rough Notes}
+% There doesn't appear to be a standardized format to EMNLP Industry papers. Here are two papers, first of which has some sections dedicated to deployment, and the second is more like a traditional research paper:
+
+% \begin{enumerate}
+%     \item https://aclanthology.org/2023.emnlp-industry.10.pdf
+%     \item https://aclanthology.org/2023.emnlp-industry.12.pdf
+% \end{enumerate}
+
+% Still, the former is more like what we would be presenting. What sets us a apart from other AI detection papers is the widespread use of our tool, and the challenges/opportunities that brings
+
+% Bibliography entries for the entire Anthology, followed by custom entries
+%\bibliography{anthology,custom}
+% Custom bibliography entries only
+\bibliography{acl_latex}
+\newpage
+\appendix
+
+\section{Training Dataset Statistics}
+\label{sec:training_data_stats}
+Table \ref{table:training_data_stats} shows the number of documents, and label types per each dataset in our training database. Having such a large dataset enables us to tune the data used at training time such that we can prioritize certain domains, or prioritize accuracy on human documents.
+\begin{table}
+    \centering
+    \begin{tabular}{lrr}
+    \toprule
+         Domain & \# Documents &  Labels \\
+    \midrule
+       Academic & 1.25M & AI, Human \\
+       Conversation & 32K & AI \\
+       Encyclopedia & 2.8M & AI, Human \\
+       Essay & 234K & AI, Human \\
+       News & 16M & AI, Human \\
+       Q\&A & 65K & AI, Human \\
+       Reviews & 173K & AI, Human \\
+       Web Articles & 8M & AI, Human \\
+    \bottomrule
+    \end{tabular}
+    \caption{Training dataset statistics.}
+    \label{table:training_data_stats}
+\end{table}
+
+\section{Challenges with Data}
+Table \ref{table:dataset_bias} shows some of the challenges faced in terms of debiasing data to prevent the model from relying on spurious shortcuts.
+\label{sec:}
+\begin{table*}[h!]
+    \centering
+    \begin{tabular}{p{0.6\textwidth} p{0.2\textwidth} p{0.2\textwidth}}
+        \toprule
+         Example & Label & Dataset \\
+        \midrule
+        many lepidopteran insects are agricultural pests that affect stored grains , food and fiber crops . & Human & Scientific Papers \\
+        \midrule
+        The sine-Gordon field theory and its associated massive Thirring model are quantum field theories that have been extensively studied by researchers.  & AI & Scientific Papers \\
+        \midrule
+        Suddenly , Google could find itself in a position where it has to explain that they can not perform miracles to a fully committed audience invested in the idea that they can . All of these and many , many more ways to fall off exist . There 's no rest for the weary , as they say . :-) & Human & HC3 Plus \\
+        \midrule
+        These include the financial performance and prospects of the company, the strength of its management and leadership, the stability and growth potential of its industry, and the overall state of the economy.Additionally, the value of a share may be influenced by the demand for the stock among investors, as well as the supply of the stock that is available for purchase. & AI & HC3 Plus \\
+        \bottomrule
+    \end{tabular}
+    \caption{Example of formatting biases. The human document in Scientific Papers is all lowercase with extraneous spacing around punctuation, while the AI document has correct capitalization and spacing. The human document in HC3 Plus has an emoji and extraneous spacing, while the AI document is more formal, and is missing space before "Additionally". }
+    \label{table:dataset_bias}
+\end{table*}
+
+
+\section{Case Study Details}
+\subsection{Baselines}
+\textbf{Radar} The official Hugging Face implementation of Radar to compute a probability score. This is simply a RoBERTa model with a classification head \href{implementation}{https://huggingface.co/TrustSafeAI/RADAR-Vicuna-7B}. 
+
+\noindent \textbf{Binoculars}
+For Binoculars, we use Llama-2 7B and Llama-2 7B-chat as the two models used to compute the cross perplexity score. Input text is tokenized similarly for each model, and a sigmoid activation is used similar to perplexity to transform scores into a probability.
+
+\noindent \textbf{Pangram} The Pangram API offers a `prediction\_short` field indicating the document-level prediction according to their internal threshold, while `fraction\_ai`, `fraction\_ai\_assisted`, `fraction\_human` indicate the percentage of the document that is entirely AI-generated, polished by AI, or written by a human respectively.
+We use Pangram's V3 API in our analysis.
+
+\noindent \textbf{Originality} The Originality API provides a `classification` field indicating the predicted class, and a `confidence` field indicating the likelihood that the predicted class is the true class. We use Originality's V3 API in our analysis.
+
+
+\subsection{Datasets}
+All data is available at our \url{https://github.com/nlpiskey/emnlp_2025_submission}. Below we describe high-level statistics for each dataset.
+\label{sec:case_study_dataset_details}
+
+\textbf{Domain Specific} \\ For \texttt{Reviews} we use a balanced dataset of 1000 yelp reviews. The human reviews were gathered from the publicly available version available on HuggingFace.
+% We do not train on this data as it does not have a commercial-friendly license.
+We generate corresponding AI versions using proprietary prompts. For \texttt{Abstracts}, we use balanced subset of 500 scientific abstracts generated by Mistral (both chat and non-chat versions) from the RAID benchmark \href{dataset}{https://github.com/liamdugan/raid}. 
+For \texttt{Essays} we use a balanced dataset of 200 texts from the Essay Forum dataset, generations from Dolly, and the Outfox dataset.
+
+% \textbf{Multilingual} The French dataset comprises of 100 balanced documents which are a combination of encyclopedia articles and news articles. The Spanish dataset contains 100 balanced documents which are a combination of encyclopedia articles and essays.
+
+% \textbf{ESL} We use all of TOEFL91 and 100 samples from WI+Locness \cite{Bryant2019-se}.
+
+\textbf{M4-PeerReviews} The M4 PeerReviews dataset \cite{wang-etal-2024-m4} consists of 1000 balanced samples where human data is extracted from top-tier publishing venues such as ACL, NIPS and ICLR and AI samples are stratified between generators such as bloomz, ChatGPT, Cohere, Davinci and Dolly. 
+
+\textbf {FDGPT-Writing} This dataset is prepared from the FastDetectGPT \cite{bao2023fast} data repository and comprises human written stories and prompts scraped using Reddit Writing Prompts and Reddit API and corresponding AI completions from the derived prompts. The subset consists of 300 balanced samples with AI samples stratified between generators such as Davinci, GPT 3.5 and GPT 4. 
+
+
+\section{Internal Evaluation Set}
+\label{sec:internal_evaluation_set}
+Beyond publicly available benchmarks, we use an internal evaluation set for evaluating our model. This evaluation set contains 40k documents with label proportion 40\% human, 40\% AI, and 20\% mixed. It is subsampled from the test split that was generated from splitting our training data into non-overlapping datasets, but it also includes out-of-distribution datasets for more challenging evaluation. 
+
+\section{Formatting Benchmark Set}
+\label{sec:formatting_benchmark_set}
+We subset our Internal Evaluation Set (Section \ref{sec:internal_evaluation_set}) to approximately 2,000 documents which contain bold formatting, and another 2,000 documents which contain lists. For the bold formatting benchmark corresponding documents with the bold formatting removed were created, and for the list benchmark, documents with the list items merged into sentences were created. Both benchmarks are made up of roughly 60\% AI texts, and 40\% human texts.
+
+
+
+% \section{User Submission Statistics}
+% Here we visualize some basic statistics about our user submissions. Most submissions are quite short (under 200 words), and there does appear to be a slight length bias in terms of documents predicted to be human being longer on average than mixed documents. Additionally, 54\% of submissions are classified as human, while 43\% are classified as AI, and the remainder mixed.
+% % On average, we scan over 10 million documents per month.
+% \label{sec:user_submission_stats}
+
+% \begin{figure}[h!]
+%     \centering
+%     \includegraphics[width=\linewidth]{figures/num_words_distribution.png}
+%     \caption{Distribution of number of words per user submission}
+%     \label{figure:num_words_distribution}
+% \end{figure}
+
+% \begin{figure}[h!]
+%     \centering
+%     \includegraphics[width=\linewidth]{figures/num_words_per_class.png}
+%     \caption{Distribution of number of words per class}
+%     \label{figure:num_words_per_class}
+% \end{figure}
+
+
+
+% \section{Architecture Overview}
+% \begin{figure*}[h!]
+%     \centering
+%     \includegraphics[width=\linewidth]{figures/neural_network_diagram.pdf}
+%     \caption{A schematic of our multi-task architecture.}
+%     \label{figure:neural_network_diagram}
+% \end{figure*}
+
+
+% \section{Cloud Infrastructure Diagram}
+% Our AWS infrastructure supports elastic scaling on demand, allowing us to scan millions of documents per month. 
+% \label{sec:cloud_infra_diagram}
+% \begin{figure*}[h!]
+%     \centering
+%     \includegraphics[width=\linewidth]{figures/cloud_architecture.pdf}
+%     \caption{A schematic of cloud infrastructure. Multiple ECS clusters handle model-specific requests, with the web server deciding which cluster to route requests to. Analytics are performed on documents at scale using Databricks to inform future data gathering and evaluation efforts.}
+%     \label{figure:cloud_architecture}
+% \end{figure*}
+
+% \section{Hierarchical Prediction Head}
+% Figure \ref{figure:hier_overall} shows the hierarchical structure of our document-level prediction head.
+
+
+
+\section{User Interface}
+Figure \ref{figure:user_interface} shows the main \gptzero{} user interface, displaying the predicted class and associated confidence scores in the top \textit{Classification} section, along with tooltips explaining how to interpret these values. 
+These explanations help ensure the responsible use of our detector, as many users lack background in statistics and hypothesis testing \cite{Zhang2020-tf}. 
+Advanced users may also specify a confidence threshold appropriate for their required levels of precision and recall (see also Sec. \ref{sec:calibration}).
+The \textit{Probability Breakdown} section then shows the probability assigned by our detector to the human, AI, and mixed classes, providing complementary information to the predicted class confidence. 
+
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\linewidth]{figures/main_interface_new.png}
+    \caption{Main user interface for document scans. An overall Classification is presented along with a user-friendly confidence category. Per-class likelihoods are shown in the Probability Breakdown section.}
+    \label{figure:user_interface}
+\end{figure}
+
+\section{User Feedback}
+Users are able to provide feedback on multiple aspects of our detector including accuracy and interface usability. 
+\label{sec:user_feedback}
+
+
+
+
+
+% \subsection{Latency Analysis}
+% \label{sec:latency_analysis}
+% \begin{table}
+%     \centering
+%     \begin{tabular}{lrr}
+%     \toprule
+%          RPS & Median RT &  95\% RT \\
+%     \midrule
+%        10 & 480 & 860 \\
+%     \bottomrule
+%     \end{tabular}
+%     \caption{Single model deployment load testing results on 1000 word documents. RPS: requests per second, RT: response time (ms).}
+%     \label{table:latency}
+% \end{table}
+
+\section{Deep Scan}
+\label{sec:appendix_deep_scan}
+\subsection{Visual example}
+
+% \subsection{Algorithm Description}
+% Our interpretability method is an adaptation of two methods: Saliency and Occlusion \cite{Atanasova2020-uz}. We use saliency to identify the tokens that would contribute the most affect the output of the predicted class if changed. Based on user submissions, we observe that writers mainly replace some words with their synonyms, or remove them altogether. By following a multi-step process of replacing the most salient words with their synonyms, a null token, or deleteing those words, we can identify how our model's predictions would change in a way that is aligned with user edit behavior. Our proprietary innovation focuses on how to aggregate these scores in such a way that balances explaining what our model focuses on, but prevents the risk of users exploiting this information to adversarial attack it.
+
+Figure \ref{fig:deep_scan} visualizes our Deep Scan feature on a GPT4-generated document. Scores indicate the importance of each sentence to the human or AI class. The document that was scanned has predicted to be AI with high confidence, but the second sentence in the second paragraph causes our detector to lower its predicted probability compared to what it otherwise would have been. 
+
+
+
+\section{Cloud Infrastructure}
+Model deployments are hosted using Amazon Web Services (AWS) Elastic Container Services (ECS) on Nvidia Ampere GPUs.
+% primarily on g5.2xlarge EC2 instances with a single NVIDIA A10 GPU. 
+We load test a single instance with 10 concurrent users sending requests at a constant rate and observe that each instance is capable of handling up to 10 requests per second with a median repsonse time of 480ms, and with 95\% of requests being served in under 860ms.
+% \alexc{this doubt might age poorly given moores law} A method such as Binoculars which requires performing inference with two medium-sized (>7b parameters) LLMs is impractical to deploy as supporting this level of throughput while being cost-effective is infeasible. 
+
+\begin{figure*}
+    \centering
+    \includegraphics[width=0.7\linewidth]{figures/user_feedback.png}
+    \caption{Our user feedback collection interface for improving predictions.}
+    \label{figure:user_feedback}
+\end{figure*}
+
+\begin{figure*}[h!]
+    \centering
+    \includegraphics[width=\linewidth]{figures/deep_scan.png}
+    \caption{Example of the \gptzero{} Deep Scan feature showing the most important sentences contributing to a prediction.}
+    \label{fig:deep_scan}
+\end{figure*}
+
+
+\subsection{Classifier Details}
+We trained an XGBoost classifier with AI and Human features that was applied to 2000 balanced AI and Human examples stratified across domains such as news, scientific writing, and creative writing and reviews where AI generations were obtained from a wide range of LLM model families such as openAI (GPT-4x, GPT-3.5), Claude and Gemini.
+
+A grid-search was performed using the following parameters on a validation split and the best model selected for feature selection:
+
+\begin{itemize}
+    \item \textbf{Max Leaf Nodes}: [50, 100, 200, 300]
+    \item \textbf{Max Depth}: [3, 5, 7, 10]
+    \item \textbf{Number of Trees}: [100, 200, 300, 500]
+    \item \textbf{Learning Rate}: [0.01, 0.05, 0.1, 0.2, 0.3]
+\end{itemize}
+
+Using the resultant model, we reduced an initial feature set comprising $\sim 200$ features per label to $\sim 20$ based on feature importances.
+ 
+
+
+
+% \alexa{Edwin to fill in details here about
+% \begin{enumerate}
+%     \item XGBoost Hyperparameters
+%     \item Number of features before and after filtering/clustering
+%     \item Train/test sizes (also include breakdown of \# of human and AI documents)
+% \end{enumerate}
+% }
+
+
+\subsection{Classification Results}
+\begin{table}[H]
+    \centering
+    \resizebox{0.9\columnwidth}{!}{
+        \begin{tabular}{lrrrr}
+        \toprule
+             Class & Precision (\%) & Recall (\%) & Accuracy (\%) \\
+        \midrule
+             AI    & 90.0 & 91.0 & 91.0 \\
+             Human & 91.0 & 90.0 & 90.0 \\
+        \bottomrule
+        \end{tabular}
+    }
+    \caption{Classification metrics (in \%) for AI and Human classes using mined features.}
+    \label{table:classification_metrics_nlu}
+\end{table}
+
+
+\newpage
+\section{Sub-class separability}
+
+We prepared a nearly balanced dataset consisting of paired AI and AI Paraphrased examples from multiple domains such as social media, consumer reviews, news, online articles/blogs, encyclopedia, student essays etc. and used it to benchmark our model. 
+The sub-classes AI and AI-paraphrased are quite separable using our hierarchical classification methodology as seen in Fig. \ref{figure:confusion_matrix_aip_pureai}.
+
+We note that we are able to achieve a FPR <=0.5\% on the AI class. However, we observe a higher number of False Negatives for the AI paraphrased class. This stems from the inclusion of outputs from lower quality AI-paraphraser tools and settings, which introduces minimal perturbations and are considered poor AI bypass attempts. Classifying such samples as LLM generated is an acceptable detection standard.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.4]{figures/confusion_matrix_ai_aip.png}
+\caption{Confusion Matrix representing AI vs Pure AI classes.}
+\label{figure:confusion_matrix_aip_pureai}
+\end{figure}
+
+
+\section{Postprocessing Predictions to Limit False Positives}
+\label{sec:calibration}
+% A challenge with deep architectures trained to classify texts is their tendency to produce overly confident predictions \cite{Guo2017-wo}. 
+We consider it to be particularly important to limit false positive errors by transforming low confidence AI/mixed predictions to human. 
+This is because most users will not specify thresholds of their own and false allegations of text being AI-written can have harmful consequences for the writer. 
+Figure \ref{figure:calibration} compares our detector's output distribution on an internal benchmark of ~27,000 samples with and without our custom output mapping, and the expected calibration error (ECE) \cite{Guo2017-wo}.
+\gptzero{}'s custom output mapping is optimized to both reduce ECE with a focus on penalizing overly confident predictions, while also reducing the most harmful effects of false positives. 
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[b]{0.45\columnwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/without_mapping_output_distribution.png}
+        \caption{Output distribution without mapping (ECE=0.074)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\columnwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/with_mapping_output_distribution.png}
+        \caption{Output distribution with mapping (ECE=0.070)}
+    \end{subfigure}
+    \caption{Remapping outputs to reduce overconfident predictions limits the negative effects of false positives.}
+    \label{figure:calibration}
+\end{figure}
+
+\begin{equation*}
+    \mathrm{ECE} = \sum_{m=1}^{M} \frac{|B_{m}|}{n} |\mathrm{acc}(B_{m}) - \mathrm{conf}(B_{m})|
+\end{equation*}
+\noindent where $B_{m}=\{s\in\mathcal S:\mathrm{conf}(s)\in(\frac{m-1}{M},\frac{m}{M}]\}$ is formed as a bin of samples with similar confidence value, grouped into a total of $M$ bins. 
+$\mathrm{acc}(B_{m})$ and $\mathrm{conf}(B_{m})$ are the average accuracy and confidence of samples in $B_{m}$. 
+
+\section{Polishing Prompts}
+\label{appendix:polishing_prompts}
+Table \ref{table:polish_prompts} shows several examples of polishing prompts that we use to generate Polished texts, as well as example outputs for a given human document.
+
+Human Document: 
+
+\begin{table*}[t]
+\centering
+\small
+\begin{tabular}{p{0.2\textwidth} p{0.8\textwidth}}
+\toprule
+\textbf{Prompt} & \textbf{Polished Text} \\
+Original Human Document & The author gave a loving mood in the memoir. I know this becacus he did not talk badily about anything and he talked about how his parents helped him and other people as a kit. in paragraph two he was talking about how his house was nice and comsortabur. I know this because he sais. the love of cooking and the passioniate Cuban music. \\
+Polish this text: & The author creates a warm, loving tone in the memoir. I know this because he doesn’t speak negatively about anything; instead, he focuses on how his parents helped him and others when he was a child. In paragraph two, he describes his home as nice and comfortable. I can tell because he mentions “the love of cooking” and “the passionate Cuban music,” which help paint a cozy, caring atmosphere.  \\
+\midrule
+Make this text sound more fluid: & The author creates a warm, loving tone throughout the memoir. I can tell because he doesn’t speak negatively about anything—instead, he focuses on how his parents supported him and cared for others when he was a child. In paragraph two, he describes his home as nice and comfortable, shown through details like the love of cooking and the passionate Cuban music. \\
+\midrule
+Improve the quality of this text while maintaining a human voice: & The author creates a warm, loving tone throughout the memoir. I can tell because he doesn’t speak negatively about anything. Instead, he focuses on how his parents supported him and how other people helped him when he was a kid. In paragraph two, he describes his home as nice and comfortable. You can see this in the details he shares, like the love of cooking and the passionate Cuban music. \\
+\midrule
+Improve the spelling and grammar in this text: & The author created a loving mood in the memoir. I know this because he did not speak badly about anything. He talked about how his parents helped him and other people when he was a kid. In paragraph two, he talked about how his house was nice and comfortable. I know this because he says he loved cooking and passionate Cuban music.\\
+\bottomrule
+\end{tabular}
+\caption{A comparison of some polishing prompts used for generated texts trained under the Polished class.}
+\label{table:polish_prompts}
+\end{table*}
+
+
+\section{Black-Box Paraphraser Services}
+\label{appendix:paraphraser_services}
+Table \ref{table:paraphraser_services} Shows all of the paraphraser services we evaluate against. 
+\begin{table*}[t]
+\centering
+\small
+\begin{tabular}{p{0.2\textwidth} p{0.2\textwidth}}
+\toprule
+\textbf{Service} & \textbf{Bypassing Ability on Naive AI Detectors} \\ 
+GPTinf & Low \\
+Grubby AI & Medium \\
+HIX & Low\\
+Quillbot & Low \\ 
+StealthGPT & Low \\
+StealthWriter & Low \\
+TwainGPT & Medium \\ 
+Undetectable & High \\ 
+WriteHuman & Medium \\
+\bottomrule
+\end{tabular}
+\caption{A list of bypassing services and their bypassing ability on naive AI detection methods. These methods are all ineffective against GPTZero due to the four-tiered red teaming approach.}
+\label{table:paraphraser_services}
+\end{table*}
+
+\end{document}
