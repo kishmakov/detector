@@ -84,3 +84,32 @@ GPT-2-based model for predicting probabilities of words as it traces text.
 
 
 
+<!-- --------------------------------------------------------------------------- -->
+
+## Binoculars
+
+### Addressed Problems
+
+Binoculars focuses on AI text detection:
+
+- Distinguishing human-written vs AI-generated text
+
+### Methods
+
+Variant of a contrastive method. uses two pre-trained LLMs.
+- One **observer** model computes the log perplexity .
+- Second **performer** model generates next-token predictions,
+  and the observer then evaluates those predictions via
+  cross-perplexity.
+
+
+### Quality Measures
+
+- False Positive Rate
+- True Positive Rate
+
+### Disadvantages
+
+Needs to have open LLMs.
+
+
