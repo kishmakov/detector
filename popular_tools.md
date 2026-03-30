@@ -69,6 +69,9 @@ In-house supervised model (elements of NLP + deep learning).
 GLTR focuses on AI text detection:
 
 - Distinguishing human-written vs AI-generated text
+- Provide more granular probabilities:.
+
+![GLTR](images/GLTR_words_probability.png)
 
 ### Methods
 
