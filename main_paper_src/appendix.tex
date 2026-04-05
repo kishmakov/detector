@@ -1,0 +1,359 @@
+\documentclass{article}
+
+
+
+
+
+\usepackage{appendix}
+
+
+
+
+
+
+
+
+\usepackage[utf8]{inputenc} %
+\usepackage[T1]{fontenc}    %
+\usepackage{hyperref}       %
+\usepackage{url}            %
+\usepackage{booktabs}       %
+\usepackage{amsfonts}       %
+\usepackage{nicefrac}       %
+\usepackage{microtype}      %
+\usepackage{xcolor}         %
+\usepackage{xr}
+
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{subcaption}
+
+\newtheorem{definition}{Definition}
+
+\makeatletter
+\newcommand*{\addFileDependency}[1]{%
+\typeout{(#1)}%
+\@addtofilelist{#1}
+\IfFileExists{#1}{}{\typeout{No file #1.}}
+}\makeatother
+
+\newcommand*{\myexternaldocument}[1]{%
+\externaldocument{#1}%
+\addFileDependency{#1.tex}%
+\addFileDependency{#1.aux}%
+}
+
+\myexternaldocument{main}
+
+\appendix
+
+\title{Appendix }
+
+\begin{document}
+
+
+\setcounter{figure}{6}
+\setcounter{table}{4}
+
+
+\section{Theory}
+\def\th{\mathrm{t}}
+\def\PH{\mathrm{PH}}
+
+\begin{figure}
+     \centering
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{figures/line.png}
+         \caption{Point cloud concentrated around a straight line; $PHD \approx 1.0$}
+         \label{fig:line}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{figures/galaxy.png}
+         \caption{Point cloud concentrated around two curved intertwined lined; $PHD \approx 1.5$}
+         \label{fig:galaxy}
+     \end{subfigure}
+     \caption{Example of the difference between intrinsic dimensionality (PHD) of point clouds for different geometric shapes. The point cloud concentrated around a more complex structure (\ref{fig:galaxy}) has larger PHD than a point cloud concentrated around a simpler structure (\ref{fig:line}).}
+\end{figure}
+
+\subsection{Formal definitions of persistent homologies}
+
+A persistent homology is a sequence of homology groups and linear maps parameterized by a filtration value.
+Formally speaking, given a filtered chain complex \((K,\partial)\) with filtration values \( \lambda_1 < \lambda_2 < \ldots < \lambda_n\), we have a sequence of chain complexes:
+\(
+ K_{\lambda_0} \subseteq K_{\lambda_1} \subseteq K_{\lambda_2} \subseteq \ldots \subseteq K_{\lambda_n} = K.
+\)
+For each \(\lambda_j\),  the \(i\)-th homology group \(H_i(K_{\lambda_j})\) denotes the factor vector space  
+\(H_i(K_{\lambda_j})=\ker\partial\vert_{K^{(i)}_{\lambda_j}}/\operatorname{im}\partial\vert_{K^{(i)}_{\lambda_j}}\). The inclusion \(K_{\lambda_j} \subseteq K_{\lambda_{j+r}}\) induces a linear map \(f_{j,j+r}: H_i(K_{\lambda_j}) \rightarrow H_i(K_{\lambda_{j+r}})\).
+By definition, the persistent homology $\PH_{i}$ of the filtered chain complex is the collection of homology groups \(H_i(K_{\lambda_j})\) and linear maps between them: \(\PH_{i}=\{H_i(K_{\lambda_j})\), \(f_{j,j+r}\}_{j,r}\). 
+
+By the structure theorem of persistent homology, a filtered chain complex \((K,\partial)\)  is decomposed into the unique direct sum of standard filtered chain complexes of types \(I(b_p,d_p)\) and  \(I(h_p)\), where \(I(b,d)\)
+is the filtered complex spanned linearly by two elements \(e_b,e_d,\,\partial e_d=e_b\) with filtrations \(e_b\in I^{(i)}_b\), \(e_d\in I^{(i+1)}_d\), $b\leq d$ and \(I(h)\) is the filtered complex spanned by a single element \(\partial e_h=0\) with filtration \(e_h\in I^{(i)}_h\) \citep{barannikov1994}. This collection of filtered complexes \(I(b_p,d_p)\) and  \(I(h_p)\) from the decomposition of $K$ is called the $i$th \emph{Persistence Barcode} of the filtered complex \(K\). It is represented as the multiset of the intervals  \([b_p,d_p]\) and  \([h_p,+\infty)\). In Section \ref{sec:id}, when we speak loosely about the  persistent homology $\PH_{i}$, we actually mean the $i$th persistence barcode. In particular, the summation $\sum\nolimits_{\gamma \in \PH_{i}} $ is the summation  over the multiset of intervals constituting the $i$th persistence barcode.
+
+\subsection{Equivalence between $\textrm{PH}_0\textrm{(S)}$ and MST(S)}
+
+For the reader's convenience, we provide a sketch of the equivalence between the $0$th persistence barcodes and the set of edges in the minimal spanning tree (MST).
+
+First, recall the process of constructing the $0$-dimensional persistence barcode \citep{adams2020fractal}. Given a set of points $S$, we consider a simplicial complex $K$ consisting of points and all edges between them (we do not need to consider faces of higher order to compute $H_0$): $K=\{S\}\cup\{(s_i, s_j)| s_i, s_j\in S\}$. Each element in the filtration \(
+ K_{\lambda_0} \subseteq K_{\lambda_1} \subseteq K_{\lambda_2} \subseteq \ldots \subseteq K_{\lambda_n} = K
+\) contains edges shorter than the threshold $\lambda_k$: $K_{\lambda_k} = \{S\}\cup\{(s_i, s_j) | s_i, s_j\in S, ||s_i-s_j||<\lambda_k\}$. The $0$-th persistence barcode is the collection of lifespans of $0$-dimensional features, which correspond to connected components, evaluated with growths of the threshold $\lambda$. Let us define a step-by-step algorithm for evaluating the features' lifespans. We start from $\lambda=0$, when each point is a connected component, so all the features are born. We add edges to the complex in increasing order. On each step, we are given a set of connected components and a queue of the remaining edges ordered by length. If the next edge of length $\lambda$ connects two connected components to each other, we claim the \emph{death} of the first component and add a new lifespan $(0,\lambda)$ to the persistence barcode; otherwise, we just remove the edge from the queue since its addition to the complex does not influence the $0$th barcode.  
+
+Now we can notice that this algorithm  corresponds exactly to the classical Prim's algorithm for MST construction, where the appearance of a new bar $(0,\lambda)$ corresponds to adding an edge of length $\lambda$ to the MST.
+
+
+
+
+\section{Algorithm for computing the PHD}
+
+In Section \ref{sec:method} of the paper, we describe a general scheme for the computation of persistence homology dimension (PHD). Here we give a more detailed explanation of the algorithm.
+
+\textbf{Input: } a set of points $S$ with $|S| = n$. 
+
+\textbf{Output: } $\dim_{PH}^0 (S)$. 
+
+\begin{enumerate}
+    \item Choose $n_i = \frac{(i - 1) (n - \hat{n})}{k} + \hat{n}$ for $i \in \overline{1, \ldots k}$; hence, $n_1 = \hat{n}$ and $n_k = n$. Value of $k$ may be varied, but we found that $k = 8$ is a good trade-off between speed of computation and variance of PHD estimation for our data (our sets of points vary between $50$ and $510$ in size). As for $\hat{n}$, we always used $\hat{n} = 40$. 
+    \item For each $i$ in $1, 2, \ldots k$ 
+    \begin{enumerate}
+        \item Sample $J$ subsets $S_i^{(1)}, \ldots S_i^{(J)}$ of size $n_i$. For all our experiments we took $J = 7$.
+        \item For each  $S_i^{(j)}$ calculate the sum of lengths of intervals in the 0th persistence barcode $E_0^1(S_i^{(j)})$.
+        \item Denote by $E(S_i)$ the median of $E_0^1(S_i^{(j)}), j \in \overline{1, \ldots J}$. 
+    \end{enumerate}
+    \item Prepare a dataset consisting of $k$ pairs $D=\{(\log n_i, \log E(S_i))\}$ and apply linear regression to approximate this set by a line. Let $\kappa$ be the slope of the fitted line. 
+
+    \item Repeat steps 2-3 two more times for different random seeds, thus obtaining three slope values $\kappa_1$, $\kappa_2$, $\kappa_3$, and take the final $\kappa_F$ as their average.     
+    \item Estimate the dimension $d$ as $\frac{1}{1-\kappa_F}$
+\end{enumerate}
+
+\section{Additional experiments}
+
+\subsection{Choice of parameters in the formula for PHD}
+
+As we have mentioned in Section \ref{sec:id}, we estimate the value of persistent homology dimension from the slope of the linear regression between $\log E_\alpha^0(X_{n_i})$ and $\log{n_i}$. Thus, the exact value of PHD of a text actually depends on the non-negative parameter $\alpha$. The theory requires it to be chosen to be less than the intrinsic dimension of the text, and in all our experiments we fix $\alpha = 1.0$.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.95\textwidth]{figures/alpha.png}
+  \caption{PHD estimates at various $\alpha$ for a natural and a generated texts.}
+  \label{fig:alpha}
+\end{figure}
+
+Figure \ref{fig:alpha} shows how the exact value of the PHD for natural and generated texts (of approximately the same length) depends on the choice of $\alpha$. 
+Setting $\alpha = 1.0$ seems to yield reasonable performance, but further investigation of this issue is needed.
+
+For $\alpha \in [0.5; 2.5]$ our results, in general, lie in line with the experiments by \cite{birdal2021intrinsic}, where performance of $\dim_{PH}^0$ with $\alpha$ varying between $0.5$ and $2.5$ was studied on different types of data.
+
+
+
+\subsection{Effect of paraphrasing on intrinsic dimension}
+
+As we show in 
+Section~\ref{sec:method}, using paraphrasing tools has little effect on the PHD-based detector's ability to capture the differences between generated and natural texts. Here we show how such tampering with generated sentences affects their intrinsic dimension. Table~\ref{tab:dipper_effect} presents the mean values of PHD and MLE after applying DIPPER with different parameters to the generation of GPT-3.5 Davinci. Where the value of Order (re-ordering rate) is not specified, it means the it was left at the default value 0. Both parameters, Lex (lexical diversity rate) and Order, can vary from 0 to 100; for additional information we refer to the original paper on DIPPER \citep{krishna2023paraphrasing}.
+
+Increased lexical diversity entails slight growth in both mean PHD and mean MLE that, in theory, should make our detectors less efficient. In the case of a PHD-based detector we do not observe this decrease in performance, probably due to the mean shift being indeed rather small and caused mostly by the right tail of the distribution --- the texts that had a high chance of evading detection even before paraphrasing. 
+
+Meanwhile, increasing the re-ordering rate from $0$ to $60$ has almost no noticeable impact.
+
+\begin{table}
+    \centering
+    \caption{Effect of paraphrasing on the intrinsic dimension of the text. Here we can see an uncommon example of data where MLE and PHD behave differently: paraphrasing does not present much trouble for PHD (its quality even increases marginally), but the performance of the MLE-based detector drops significantly, especially for GPT-3.5.}
+    \begin{tabular}{c|c|cccccc}
+        \toprule
+         & & \multicolumn{6}{c}{DIPPER parameters} \\
+        \multirow{2}{*}{\textbf{Method}} & \multirow{2}{*}{Original} & \multirow{2}{*}{Lex 20} & Lex 20 & \multirow{2}{*}{Lex 40} & Lex 40 & \multirow{2}{*}{Lex 60} & Lex 60\\
+         &  &  & Order 60 &  &  Order 60 & &  Order 60\\
+         \midrule
+         PHD & $7.30$ & $7.33 $ & $7.35 $ & $7.42 $ & $7.45 $ & $7.51 $ & $7.51 $ \\
+          & $\pm 1.66$ & $\pm 1.69$ & $\pm 1.16$ & $\pm 1.69$ & $\pm 1.78$ & $\pm 1.76$ & $\pm 1.72$\\
+         MLE & $9.68 $ & $9.91 $ & $9.90 $ & $9.97 $  & $9.95$ & $10.00$ & $10.01 $ \\
+         & $\pm 1.31$ & $\pm 1.22$ & $\pm 1.24$ & $\pm 1.22$ & $ \pm 1.21$ & $\pm 1.18$ & $\pm 1.15$ \\
+         \bottomrule
+    \end{tabular}
+    \label{tab:dipper_effect}
+\end{table}
+
+\subsection{Non-native speaker bias}
+Here we present full results for our experiments on the bias of ML-based artificial text detectors. Figure \ref{fig:gpt_bias_appnd} presents baseline results for all detectors studied by \citet{liang2023gpt} that were not included into the main text of the paper.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.95\textwidth]{figures/gpt_bias_ac_appnd.png}
+  \caption{Comparison of GPT detectors in a non-standard environment. Left: bias against non-native English writing samples (lower is better). Right: effect of the prompt design on performance (higher is better).}
+  \label{fig:gpt_bias_appnd}
+\end{figure}
+
+\subsection{Intrinsic dimension of texts in different languages}
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.85\textwidth]{figures/many_langs_appnd.png}
+  \caption{Boxplots of PHD distributions in different languages on Wikipedia data. Embeddings are obtained from XLM-RoBERTa-base (multilingual).}
+  \label{fig:many_langs_appnd}\vspace{.2cm}
+\end{figure}
+
+Figure \ref{fig:many_langs_appnd} presents the PHD of natural and generated texts in different languages on Wikipedia data. Embeddings were obtained from the same multilingual model XLM-RoBERTa-base.
+
+\section{Examples of generated texts}
+
+Table~\ref{tbl:gen} provides examples of original text and text generated by ChatGPT. 
+
+\begin{table}
+    \centering
+    \caption{Examples of original text and text generated by ChatGPT. The common prompt parts are highlighted in bold.}\label{tbl:gen}
+    \begin{tabular}{p{0.45\textwidth}p{0.45\textwidth}}
+    \toprule
+    Original (English) & Generated (English) \\
+    \midrule
+
+
+
+
+    
+
+    \textbf{USS Mills (DE-383)}
+    
+    \textbf{World War II North Atlantic operations}
+    
+    \textbf{After shakedown out of Bermuda, Mills trained nucleus crews for frigates and destroyer escorts off Norfolk, Virginia, until 10 January 1944 when she began transatlantic convoy escort duty.} On her second voyage into the Mediterranean, Mills’ convoy was attacked before dawn 1 April 1944, 56 miles west of Algiers by German torpedo bombers. SS Jared Ingersoll, a Liberty ship, was hit and set blazing. Mills picked up survivors who had abandoned ship, and sent a boarding party to extinguish her fires. British tug HMS Mindfull and Mills then towed Jared Ingersoll to Algiers.
+    &
+    \textbf{USS Mills (DE-383)}
+
+     \textbf{World War II North Atlantic operations}
+
+    \textbf{After shakedown out of Bermuda, Mills trained nucleus crews for frigates and destroyer escorts off Norfolk, Virginia, until 10 January 1944 when she began transatlantic convoy escort duty.} The Mills escorted her first two convoys in January and February from New York City to the United Kingdom, making four round trip crossings by May 1944. During her North Atlantic operations, Mills successfully thwarted several attacks by German U-boats, and carried out rescue operations for nearby ships in distress. She also participated in sweeping the area for mines in preparation for the Normandy invasion.\\
+    \midrule
+    Original (Spanish) & Generated (Spanish) \\
+    \midrule
+    \textbf{Currulao}
+
+    \textbf{Instrumentos}
+
+    \textbf{Si la música involucra el uso de una chirimia que es popular en la costa norte, específicamente en el Chocó: Tambor tambora, Cununos ("macho" y "hembra") y un clarinete.} Esta agrupación también puede incluir un eufonio que, en algunos casos, reemplaza o acompaña a un saxofón. 
+    Si se trata de un grupo de marimba que es popular en el sur de la región, específicamente al sur del Chocó, Valle del Cauca, Cauca y Nariño: la marimba de chonta, los cununos ("hembra" y "macho"), guasá y el tambor bajo.
+    &
+    \textbf{Currulao}
+
+    \textbf{Instrumentos}
+
+    \textbf{Si la música involucra el uso de una chirimia que es popular en la costa norte, específicamente en el Chocó: Tambor tambora, Cununos ("macho" y "hembra") y un clarinete.} El currulao es una danza musical tradicional originaria de la región de la costa Pacífica de Colombia, la cual se deriva de la mezcla de las culturas africana, indígena y española. El sonido del currulao es único y se distingue por el uso de instrumentos que le otorgan su ritmo y cadencia característicos.
+    \\
+    \midrule
+    Original (Polish) & Generated (Polish) \\
+    \midrule
+    \textbf{Juan Machuca}
+
+    \textbf{Kariera klubowa}
+
+    \textbf{Całą karierę piłkarską Juan Machuca spędził w klubie Unión Española, w którym występował w latach 1969-1987.} Z Unión Española trzykrotnie zdobył mistrzostwo Chile w 1973, 1975 i 1977. Na arenie międzynarodowej dotarł do finału Copa Libertadores 1975, w którym Unión uległ argentyńskiemu Independiente Avellaneda.
+    &
+    \textbf{Juan Machuca}
+
+    \textbf{Kariera klubowa}
+
+    \textbf{Całą karierę piłkarską Juan Machuca spędził w klubie Unión Española, w którym występował w latach 1969-1987.} Był to okres, w którym klub ten odnosił wiele sukcesów, m.in. zdobył mistrzostwo Chile w 1973 i 1975 roku oraz Puchar Chile w 1975 roku.
+    \\
+    \bottomrule    
+    \end{tabular}
+    \label{tab:examples}
+\end{table}
+
+\section{Examples of misclassified texts}\label{sec:misclassified_examples}
+
+Table~\ref{tab:misclassified_human} provides examples of misclassified human-written texts, while Table~\ref{tab:misclassified_davinci} shows misclassified texts generated by ChatGPT.
+
+\begin{table*}%
+    \centering
+    \begin{tabular}{p{0.1\textwidth}p{0.85\textwidth}}%
+         Source, PHD & Text sample \\
+          \hline
+        Human, 5.59 & The route, which is mostly a two-lane undivided road, passes through mostly rural areas of Atlantic and Cape May counties as well as the communities of Tuckahoe, Corbin City, Estell Manor, and Mays Landing. \\
+         \hline
+         Human, 5.82 & The Meridian Downtown Historic District is a combination of two older districts, the Meridian Urban Center Historic District and the Union Station Historic District. Many architectural styles are present in the districts, most from the late 19th and early 20th centuries, including Queen Anne, Colonial Revival, Italianate, Art Deco, Late Victorian, and bungalow. The districts are: East End Historic District – roughly bounded by 18th St, 11th Ave, 14th St, 14th Ave, 5th St, and 17th Ave. Highlands Historic District – roughly bounded by 15th St, 34th Ave, 19th St, and 36th Ave. Meridian Downtown Historic District – runs from the former Gulf, Mobile and Ohio Railroad north to 6th St between 18th and 26th Ave, excluding Ragsdale Survey Block 71. Meridian Urban Center Historic District – roughly bounded by 21st and 25th Aves, 6th St, and the railroad. Union Station Historic District – roughly bounded by 18th and 19th Aves, 5th St, and the railroad. Merrehope Historic District – roughly bounded by 33rd Ave, 30th Ave, 14th St, and 8th St. Mid-Town Historic District – roughly bounded by 23rd Ave, 15th St, 28th Ave, and 22nd St. Poplar Springs Road Historic District – roughly bounded by 29th St, 23rd Ave, 22nd St, and 29th Ave. West End Historic District – roughly bounded by 7th St, 28th Ave, Shearer's Branch, and 5th St. Meridian has operated under the mayor-council or "strong mayor" form of government since 1985. A mayor is elected every four years by the population at-large. The five members of the city council are elected every four years from each of the city's five wards, considered single-member districts. The mayor, the chief executive officer of the city, is responsible for administering and leading the day-to-day operations of city government. The city council is the legislative arm of the government, setting policy and annually adopting the city's operating budget. City Hall, which has been listed on the National Register of Historic Places, is located at 601 23rd Avenue. The current mayor is Percy Bland. Members of the city council include Dr. George M. Thomas, representative from Ward 1, Tyrone Johnson, representative from Ward 2, Fannie Johnson, representative from Ward 3, Kimberly Houston, representative from Ward 4, and Weston Lindemann, representative from Ward 5. The council clerk is Jo Ann Clark. \\
+    \end{tabular}
+    \caption{The most extreme (outlier) examples of misclassified texts from humans}
+    \label{tab:misclassified_human}
+\end{table*}
+
+\begin{table*}%
+    \centering
+    \begin{tabular}{p{0.1\textwidth}p{0.85\textwidth}}%
+         Source, PHD & Text sample \\
+          \hline
+ davinci, 31.06 & Moorcraft and McLaughlin's comment reflects the difficulty that the Rhodesian airmen had in distinguishing innocent refugees from guerilla fighters, as the camp was a mix of both. Sibanda's description of the camp further emphasizes the tragedy of the raid, as innocent children were among those killed. \\
+ \hline
+ davinci, 20.89 & The average annual rainfall at Tikal is approximately 1,500 mm (59 inches). However, due to the unpredictable nature of the climate, Tikal suffered from long periods of drought. These droughts could occur at any time before the ripening of the crops, endangering the food supply of the inhabitants of the city. \\
+    \end{tabular}
+    \caption{The most extreme (outlier) examples of misclassified texts from davinci-003}
+    \label{tab:misclassified_davinci}
+\end{table*}
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.99\textwidth]{figures/PHDIM_of_random.png}
+    \caption{PHD of several types of texts: created by sampling 512 random tokens uniformly from the vocabulary;  written by humans (Wikipedia); generated by text-davinci-003 with default temperature (Wikipedia domain); created by repeating the same randomly chosen token 512 times. We didn't perform any additional restarts for outliers correction here for the purpose of highlighting the edge cases. For this reason, one can see more outliers here than on Figure \ref{fig:many_generators}. The outlier texts are shown in Table \ref{tab:misclassified_davinci}}
+    \label{fig:PHD_distribution}
+\end{figure*}
+
+\section{Various Intrinsic Dimension estimators}
+\label{sec:various_id}
+
+Table \ref{tab:various_id} presents average intrinsic dimension estimations obtained by various algorithms for texts of different genres.
+
+
+
+
+\begin{table}[!t]
+    \centering
+        \caption{Intrinsic dimensions of English texts of different genres estimated by different methods.}
+    \label{tab:various_id}
+    \begin{tabular}{l|ccc}
+    \toprule
+         Intrinsic dimension estimator & Wikipedia  & Fiction stories & Question answering  \\
+         & articles & (Reddit) & (Stack Exchange) \\
+         \midrule
+         \makecell[l]{CorrInt \\ \citep{grassberger1983corrint}} & $10.05 \pm 0.57$ & $8.30 \pm 1.64 $ & $9.92 \pm 0.71$\\
+         FisherS \citep{albergante2019fishers} & $6.70 \pm 0.36$ & $6.54 \pm 0.71$ & $7.10 \pm 0.37 $\\
+         KNN \citep{carter2010knn} & $6.70 \pm 0.36$ & $6.54 \pm 0.71$ & $7.10 \pm 0.37$ \\
+         lPCA \citep{cangelosi2007lpca} & $23.18 \pm 3.60$ & $30.59 \pm 0.71$ & $7.10 \pm 0.37 $\\
+         MADA \citep{Farahmand2007MADA} & $366.3 \pm 1410.5$ & $23.2 \pm 83.8$ & $ 420.7 \pm 960.2$ \\
+         MOM \citep{amsaleg2018mom} & $11.05 \pm 1.13$ & $5.48 \pm 2.79$ & $ 12.12 \pm 0.47$ \\
+         MLE \citep{Levina2004MLE} & $11.83 \pm 0.77$ & $11.55 \pm 1.20$ & $ 12.13 \pm 1.00$ \\
+         \textbf{PHD (proposed method)} & $9.49\pm 1.01 $ & $ 9.21 \pm 1.29$ & $9.59 \pm 1.29$ \\
+         TLE \citep{amsaleg2019tle} & $10.65 \pm 0.49$ & $10.03 \pm 1.64$ & $ 11.08 \pm 0.75$ \\
+         TwoNN \citep{Facco2017TwoNN} & $5.85 \pm 1.08$ & $5.70 \pm 1.72$ & $ 5.95 \pm 1.19$ \\
+         \bottomrule
+    \end{tabular}
+\end{table}
+
+\section{Data description}
+
+Table \ref{tab:superwised_datasets} shows the sizes of data splits that were used to compare our method with universal detectors as well as for evaluating its cross-model and cross-domain performance. 
+
+Data for Wikipedia and Reddit was taken from \citep{krishna2023paraphrasing}; as for StackExchange, we assembled the dataset ourselves following the same scheme as \citet{krishna2023paraphrasing}. For all text generation models (GPT2-XL, OPT, GPT-3.5), we randomly selected 2700 pairs of natural/generated texts from the raw data.
+
+First, we divided the data into train/validation/test splits in proportion 7:1:1 to ensure that no human-written texts and no texts generated from the same prompt belong to the train and test split simultaneously. Then we filtered out all texts that were too short for stable estimation of the intrinsic dimensionality (shorter than 50 tokens) and an equal amount of texts from the opposite class.
+
+\begin{table}[!t]
+    \centering
+        \caption{Sizes of data splits (\# of natural/generated text pairs) used in our experiments on cross-model and cross-domain performance as well as for comparison of our method with universal detectors.}
+    \label{tab:superwised_datasets}
+    \begin{tabular}{cc|ccc}
+    \toprule
+         & Source & Train & Validation & Test \\
+         \midrule
+        \multirow{3}{*}{Wikipedia}& Human/GPT2 & 2001 & 275 & 281 \\
+        & Human/OPT & 1925 & 277 & 273 \\
+        & Human/GPT3.5 & 1798 & 259 & 260 \\
+        \midrule
+        \multirow{1}{*}{Reddit} & Human/GPT3.5  & 1677 & 232 & 235 \\
+        \midrule
+        \multirow{1}{*}{StackExchange} & Human/GPT3.5 & 2100 & 300 & 300 \\
+         \bottomrule
+    \end{tabular}
+\end{table}
+
+
+\end{document}

@@ -1,0 +1,456 @@
+\begin{thebibliography}{60}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Adams et~al.(2020)Adams, Aminian, Farnell, Kirby, Mirth, Neville,
+  Peterson, and Shonkwiler]{adams2020fractal}
+H.~Adams, M.~Aminian, E.~Farnell, M.~Kirby, J.~Mirth, R.~Neville, C.~Peterson,
+  and C.~Shonkwiler.
+\newblock A fractal dimension for measures via persistent homology.
+\newblock In \emph{Topological Data Analysis: The Abel Symposium 2018}, pages
+  1--31. Springer, 2020.
+
+\bibitem[Adelani et~al.(2020)Adelani, Mai, Fang, Nguyen, Yamagishi, and
+  Echizen]{adelani2020generating}
+D.~I. Adelani, H.~Mai, F.~Fang, H.~H. Nguyen, J.~Yamagishi, and I.~Echizen.
+\newblock Generating sentiment-preserving fake online reviews using neural
+  language models and their human-and machine-based detection.
+\newblock In \emph{Advanced Information Networking and Applications:
+  Proceedings of the 34th International Conference on Advanced Information
+  Networking and Applications (AINA-2020)}, pages 1341--1354. Springer, 2020.
+
+\bibitem[Aghajanyan et~al.(2021)Aghajanyan, Gupta, and
+  Zettlemoyer]{aghajanyan-etal-2021-intrinsic}
+A.~Aghajanyan, S.~Gupta, and L.~Zettlemoyer.
+\newblock Intrinsic dimensionality explains the effectiveness of language model
+  fine-tuning.
+\newblock In \emph{Proceedings of the 59th Annual Meeting of the Association
+  for Computational Linguistics and the 11th International Joint Conference on
+  Natural Language Processing (Volume 1: Long Papers)}, pages 7319--7328,
+  Online, Aug. 2021. Association for Computational Linguistics.
+\newblock \doi{10.18653/v1/2021.acl-long.568}.
+\newblock URL \url{https://aclanthology.org/2021.acl-long.568}.
+
+\bibitem[Albergante et~al.(2019)Albergante, Bac, and
+  Zinovyev]{albergante2019fishers}
+L.~Albergante, J.~Bac, and A.~Zinovyev.
+\newblock Estimating the effective dimension of large biological datasets using
+  fisher separability analysis.
+\newblock pages 1--8, 07 2019.
+\newblock \doi{10.1109/IJCNN.2019.8852450}.
+
+\bibitem[Amsaleg et~al.(2018)Amsaleg, Chelly, Furon, Girard, Houle,
+  Kawarabayashi, and Nett]{amsaleg2018mom}
+L.~Amsaleg, O.~Chelly, T.~Furon, S.~Girard, M.~Houle, K.-i. Kawarabayashi, and
+  M.~Nett.
+\newblock Extreme-value-theoretic estimation of local intrinsic dimensionality.
+\newblock \emph{Data Mining and Knoweledge Discovery}, 32(2):\penalty0 1--38,
+  November 2018.
+\newblock \doi{10.1007/s10618-018-0578-6}.
+
+\bibitem[Amsaleg et~al.(2019)Amsaleg, Chelly, Houle, Kawarabayashi,
+  Radovanovic, and Treeratanajaru]{amsaleg2019tle}
+L.~Amsaleg, O.~Chelly, M.~Houle, K.-i. Kawarabayashi, M.~Radovanovic, and
+  W.~Treeratanajaru.
+\newblock Intrinsic dimensionality estimation within tight localities.
+\newblock pages 181--189, 05 2019.
+\newblock ISBN 978-1-61197-567-3.
+\newblock \doi{10.1137/1.9781611975673.21}.
+
+\bibitem[Ansuini et~al.(2019)Ansuini, Laio, Macke, and
+  Zoccolan]{ansuini2019intrinsic}
+A.~Ansuini, A.~Laio, J.~H. Macke, and D.~Zoccolan.
+\newblock Intrinsic dimension of data representations in deep neural networks.
+\newblock \emph{Advances in Neural Information Processing Systems}, 32, 2019.
+
+\bibitem[Bac et~al.(2021)Bac, Mirkes, Gorban, Tyukin, and
+  Zinovyev]{bac2021scikit}
+J.~Bac, E.~M. Mirkes, A.~N. Gorban, I.~Tyukin, and A.~Zinovyev.
+\newblock Scikit-dimension: a python package for intrinsic dimension
+  estimation.
+\newblock \emph{Entropy}, 23\penalty0 (10):\penalty0 1368, 2021.
+
+\bibitem[Bakhtin et~al.(2019)Bakhtin, Gross, Ott, Deng, Ranzato, and
+  Szlam]{bakhtin2019real}
+A.~Bakhtin, S.~Gross, M.~Ott, Y.~Deng, M.~Ranzato, and A.~Szlam.
+\newblock Real or fake? learning to discriminate machine from human generated
+  text.
+\newblock \emph{arXiv preprint arXiv:1906.03351}, 2019.
+
+\bibitem[Barannikov(1994)]{barannikov1994}
+S.~Barannikov.
+\newblock The framed {M}orse complex and its invariants.
+\newblock \emph{Advances in Soviet Mathematics}, 21:\penalty0 93--115, 1994.
+
+\bibitem[Barannikov(2021)]{barannikov2021canonical}
+S.~Barannikov.
+\newblock {Canonical Forms = {P}ersistence Diagrams. {T}utorial}.
+\newblock In \emph{European Workshop on Computational Geometry (EuroCG 2021)},
+  2021.
+
+\bibitem[Barannikov et~al.(2021)Barannikov, Trofimov, Sotnikov, Trimbach,
+  Korotin, Filippov, and Burnaev]{NEURIPS2021_3bc31a43}
+S.~Barannikov, I.~Trofimov, G.~Sotnikov, E.~Trimbach, A.~Korotin, A.~Filippov,
+  and E.~Burnaev.
+\newblock Manifold topology divergence: a framework for comparing data
+  manifolds.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~34, pages 7294--7305, 2021.
+\newblock URL
+  \url{https://proceedings.neurips.cc/paper_files/paper/2021/file/3bc31a430954d8326605fc690ed22f4d-Paper.pdf}.
+
+\bibitem[Bauer(2021)]{Bauer2021Ripser}
+U.~Bauer.
+\newblock Ripser: efficient computation of {V}ietoris-{R}ips persistence
+  barcodes.
+\newblock \emph{J. Appl. Comput. Topol.}, 5\penalty0 (3):\penalty0 391--423,
+  2021.
+\newblock ISSN 2367-1726.
+\newblock \doi{10.1007/s41468-021-00071-5}.
+\newblock URL \url{https://doi.org/10.1007/s41468-021-00071-5}.
+
+\bibitem[Birdal et~al.(2021)Birdal, Lou, Guibas, and
+  Simsekli]{birdal2021intrinsic}
+T.~Birdal, A.~Lou, L.~J. Guibas, and U.~Simsekli.
+\newblock Intrinsic dimension, persistent homology and generalization in neural
+  networks.
+\newblock \emph{Advances in Neural Information Processing Systems},
+  34:\penalty0 6776--6789, 2021.
+
+\bibitem[Campadelli et~al.(2015)Campadelli, Casiraghi, Ceruti, and
+  Rozza]{campadelli2015intrinsic}
+P.~Campadelli, E.~Casiraghi, C.~Ceruti, and A.~Rozza.
+\newblock Intrinsic dimension estimation: Relevant techniques and a benchmark
+  framework.
+\newblock \emph{Mathematical Problems in Engineering}, 2015:\penalty0 1--21,
+  2015.
+
+\bibitem[Cangelosi and Goriely(2007)]{cangelosi2007lpca}
+R.~Cangelosi and A.~Goriely.
+\newblock Component retention in principal component analysis with application
+  to cdna microarray data.
+\newblock \emph{Biology Direct}, 2, January 2007.
+\newblock \doi{10.1186/1745-6150-2-2}.
+
+\bibitem[Carter et~al.(2010)Carter, Raich, and Hero]{carter2010knn}
+K.~Carter, R.~Raich, and A.~Hero.
+\newblock On local intrinsic dimension estimation and its applications.
+\newblock \emph{Signal Processing, IEEE Transactions on}, 58:\penalty0 650 --
+  663, 03 2010.
+\newblock \doi{10.1109/TSP.2009.2031722}.
+
+\bibitem[Chazal and Michel(2017)]{chazal2017introduction}
+F.~Chazal and B.~Michel.
+\newblock An introduction to topological data analysis: fundamental and
+  practical aspects for data scientists.
+\newblock \emph{arXiv preprint arXiv:1710.04019}, 2017.
+
+\bibitem[Cherniavskii et~al.(2022)Cherniavskii, Tulchinskii, Mikhailov,
+  Proskurina, Kushnareva, Artemova, Barannikov, Piontkovskaya, Piontkovski, and
+  Burnaev]{cherniavskii-etal-2022-acceptability}
+D.~Cherniavskii, E.~Tulchinskii, V.~Mikhailov, I.~Proskurina, L.~Kushnareva,
+  E.~Artemova, S.~Barannikov, I.~Piontkovskaya, D.~Piontkovski, and E.~Burnaev.
+\newblock Acceptability judgements via examining the topology of attention
+  maps.
+\newblock In \emph{Findings of the Association for Computational Linguistics:
+  EMNLP 2022}, pages 88--107, Abu Dhabi, United Arab Emirates, Dec. 2022.
+  Association for Computational Linguistics.
+\newblock URL \url{https://aclanthology.org/2022.findings-emnlp.7}.
+
+\bibitem[Devlin et~al.(2019)Devlin, Chang, Lee, and
+  Toutanova]{devlin-etal-2019-bert}
+J.~Devlin, M.-W. Chang, K.~Lee, and K.~Toutanova.
+\newblock {BERT}: Pre-training of deep bidirectional transformers for language
+  understanding.
+\newblock In \emph{Proceedings of the 2019 Conference of the North {A}merican
+  Chapter of the Association for Computational Linguistics: Human Language
+  Technologies, Volume 1 (Long and Short Papers)}, pages 4171--4186,
+  Minneapolis, Minnesota, June 2019. Association for Computational Linguistics.
+\newblock \doi{10.18653/v1/N19-1423}.
+\newblock URL \url{https://aclanthology.org/N19-1423}.
+
+\bibitem[Facco et~al.(2017)Facco, d’Errico, Rodriguez, and
+  Laio]{Facco2017TwoNN}
+E.~Facco, M.~d’Errico, A.~Rodriguez, and A.~Laio.
+\newblock Estimating the intrinsic dimension of datasets by a minimal
+  neighborhood information.
+\newblock \emph{Scientific Reports}, 7, 09 2017.
+\newblock \doi{10.1038/s41598-017-11873-y}.
+
+\bibitem[Fagni et~al.(2021)Fagni, Falchi, Gambini, Martella, and
+  Tesconi]{fagni2021tweepfake}
+T.~Fagni, F.~Falchi, M.~Gambini, A.~Martella, and M.~Tesconi.
+\newblock Tweepfake: About detecting deepfake tweets.
+\newblock \emph{Plos one}, 16\penalty0 (5):\penalty0 e0251415, 2021.
+
+\bibitem[Fan et~al.(2018)Fan, Lewis, and Yann]{fan2018hierarchial}
+A.~Fan, M.~Lewis, and D.~Yann.
+\newblock Hierarchical neural story generation.
+\newblock \emph{arXiv preprint arXiv: 1805.04833}, 2018.
+
+\bibitem[Farahmand et~al.(2007)Farahmand, Szepesvári, and
+  Audibert]{Farahmand2007MADA}
+A.-m. Farahmand, C.~Szepesvári, and J.-Y. Audibert.
+\newblock Manifold-adaptive dimension estimation.
+\newblock volume 227, pages 265--272, 06 2007.
+\newblock \doi{10.1145/1273496.1273530}.
+
+\bibitem[Gehrmann et~al.(2019)Gehrmann, Strobelt, and Rush]{gehrmann2019gltr}
+S.~Gehrmann, H.~Strobelt, and A.~M. Rush.
+\newblock Gltr: Statistical detection and visualization of generated text.
+\newblock In \emph{Proceedings of the 57th Annual Meeting of the Association
+  for Computational Linguistics: System Demonstrations}, pages 111--116, 2019.
+
+\bibitem[Goodfellow et~al.(2016)Goodfellow, Bengio, and
+  Courville]{Goodfellow-et-al-2016}
+I.~Goodfellow, Y.~Bengio, and A.~Courville.
+\newblock \emph{Deep Learning}.
+\newblock MIT Press, 2016.
+\newblock \url{http://www.deeplearningbook.org}.
+
+\bibitem[Goyal et~al.(2021)Goyal, Du, Ott, Anantharaman, and
+  Conneau]{goyal2021larger}
+N.~Goyal, J.~Du, M.~Ott, G.~Anantharaman, and A.~Conneau.
+\newblock Larger-scale transformers for multilingual masked language modeling.
+\newblock In \emph{Proceedings of the 6th Workshop on Representation Learning
+  for NLP (RepL4NLP-2021)}, pages 29--33, 2021.
+
+\bibitem[Grassberger and Procaccia(1983)]{grassberger1983corrint}
+P.~Grassberger and I.~Procaccia.
+\newblock Measuring the strangeness of strange attractors.
+\newblock volume~9, pages 189--208, 1983.
+\newblock \doi{10.1109/IJCNN.2019.8852450}.
+
+\bibitem[Guo et~al.(2023)Guo, Zhang, Wang, Jiang, Nie, Ding, Yue, and
+  Wu]{guo2023close}
+B.~Guo, X.~Zhang, Z.~Wang, M.~Jiang, J.~Nie, Y.~Ding, J.~Yue, and Y.~Wu.
+\newblock How close is {ChatGPT} to human experts? comparison corpus,
+  evaluation, and detection.
+\newblock \emph{arXiv preprint arXiv:2301.07597}, 2023.
+
+\bibitem[Guo et~al.(2020)Guo, Dai, Vrande{\v{c}}i{\'c}, and
+  Al-Rfou]{guo-etal-2020-wiki}
+M.~Guo, Z.~Dai, D.~Vrande{\v{c}}i{\'c}, and R.~Al-Rfou.
+\newblock {W}iki-40{B}: Multilingual language model dataset.
+\newblock In \emph{Proceedings of the Twelfth Language Resources and Evaluation
+  Conference}, pages 2440--2452, Marseille, France, May 2020. European Language
+  Resources Association.
+\newblock ISBN 979-10-95546-34-4.
+\newblock URL \url{https://aclanthology.org/2020.lrec-1.297}.
+
+\bibitem[He et~al.(2023)He, Shen, Chen, Backes, and Zhang]{he2023mgtbench}
+X.~He, X.~Shen, Z.~Chen, M.~Backes, and Y.~Zhang.
+\newblock Mgtbench: Benchmarking machine-generated text detection.
+\newblock \emph{arXiv preprint arXiv:2303.14822}, 2023.
+
+\bibitem[Hein and Audibert(2005)]{Hein-Audibert-2005}
+M.~Hein and J.-Y. Audibert.
+\newblock Intrinsic dimensionality estimation of submanifolds in rd.
+\newblock In \emph{Proceedings of the 22nd International Conference on Machine
+  Learning}, ICML '05, page 289–296, New York, NY, USA, 2005. Association for
+  Computing Machinery.
+\newblock ISBN 1595931805.
+\newblock \doi{10.1145/1102351.1102388}.
+\newblock URL \url{https://doi.org/10.1145/1102351.1102388}.
+
+\bibitem[Hsu et~al.(2021)Hsu, Bolte, Tsai, Lakhotia, Salakhutdinov, and
+  Mohamed]{hubert_paper}
+W.-N. Hsu, B.~Bolte, Y.-H. Tsai, K.~Lakhotia, R.~Salakhutdinov, and A.~Mohamed.
+\newblock Hubert: Self-supervised speech representation learning by masked
+  prediction of hidden units.
+\newblock \emph{IEEE/ACM Transactions on Audio, Speech, and Language
+  Processing}, PP:\penalty0 1--1, 10 2021.
+\newblock \doi{10.1109/TASLP.2021.3122291}.
+
+\bibitem[Jaquette and Schweinhart(2020)]{jaquette2020fractal}
+J.~Jaquette and B.~Schweinhart.
+\newblock Fractal dimension estimation with persistent homology: a comparative
+  study.
+\newblock \emph{Communications in Nonlinear Science and Numerical Simulation},
+  84:\penalty0 105163, 2020.
+
+\bibitem[Kirchenbauer et~al.(2023)Kirchenbauer, Geiping, Wen, Katz, Miers, and
+  Goldstein]{kirchenbauer2023watermark}
+J.~Kirchenbauer, J.~Geiping, Y.~Wen, J.~Katz, I.~Miers, and T.~Goldstein.
+\newblock A watermark for large language models.
+\newblock \emph{arXiv preprint arXiv:2301.10226}, 2023.
+
+\bibitem[Krishna et~al.(2022)Krishna, Chang, Wieting, and
+  Iyyer]{krishna2022rankgen}
+K.~Krishna, Y.~Chang, J.~Wieting, and M.~Iyyer.
+\newblock Rankgen: Improving text generation with large ranking models.
+\newblock \emph{arXiv preprint arXiv:2205.09726}, 2022.
+
+\bibitem[Krishna et~al.(2023)Krishna, Song, Karpinska, Wieting, and
+  Iyyer]{krishna2023paraphrasing}
+K.~Krishna, Y.~Song, M.~Karpinska, J.~Wieting, and M.~Iyyer.
+\newblock Paraphrasing evades detectors of ai-generated text, but retrieval is
+  an effective defense.
+\newblock \emph{arXiv preprint arXiv:2303.13408}, 2023.
+
+\bibitem[Kuleshov et~al.(2017)Kuleshov, Bernstein, Burnaev, and
+  Yanovich]{Kuleshov-et-al-2017}
+A.~Kuleshov, A.~Bernstein, E.~Burnaev, and Y.~Yanovich.
+\newblock Machine learning in appearance-based robot self-localization.
+\newblock In \emph{2017 16th IEEE International Conference on Machine Learning
+  and Applications (ICMLA)}, pages 106--112, 2017.
+\newblock \doi{10.1109/ICMLA.2017.0-171}.
+
+\bibitem[Kushnareva et~al.(2021)Kushnareva, Cherniavskii, Mikhailov, Artemova,
+  Barannikov, Bernstein, Piontkovskaya, Piontkovski, and
+  Burnaev]{kushnareva-etal-2021-artificial}
+L.~Kushnareva, D.~Cherniavskii, V.~Mikhailov, E.~Artemova, S.~Barannikov,
+  A.~Bernstein, I.~Piontkovskaya, D.~Piontkovski, and E.~Burnaev.
+\newblock Artificial text detection via examining the topology of attention
+  maps.
+\newblock In \emph{Proceedings of the 2021 Conference on Empirical Methods in
+  Natural Language Processing}, pages 635--649, Online and Punta Cana,
+  Dominican Republic, Nov. 2021. Association for Computational Linguistics.
+\newblock \doi{10.18653/v1/2021.emnlp-main.50}.
+\newblock URL \url{https://aclanthology.org/2021.emnlp-main.50}.
+
+\bibitem[Levina and Bickel(2004)]{Levina2004MLE}
+E.~Levina and P.~Bickel.
+\newblock Maximum likelihood estimation of intrinsic dimension.
+\newblock volume~17, 01 2004.
+
+\bibitem[Li et~al.(2018)Li, Farkhoor, Liu, and Yosinski]{measuringIDlandscape}
+C.~Li, H.~Farkhoor, R.~Liu, and J.~Yosinski.
+\newblock Measuring the intrinsic dimension of objective landscapes.
+\newblock In \emph{ICLR (Poster)}, 2018.
+\newblock URL \url{https://openreview.net/forum?id=ryup8-WCW}.
+
+\bibitem[Liang et~al.(2023)Liang, Yuksekgonul, Mao, Wu, and Zou]{liang2023gpt}
+W.~Liang, M.~Yuksekgonul, Y.~Mao, E.~Wu, and J.~Zou.
+\newblock {GPT} detectors are biased against non-native english writers.
+\newblock In \emph{ICLR 2023 Workshop on Trustworthy and Reliable Large-Scale
+  Machine Learning Models}, 2023.
+
+\bibitem[Liu et~al.(2019)Liu, Ott, Goyal, Du, Joshi, Chen, Levy, Lewis,
+  Zettlemoyer, and Stoyanov]{liu2019roberta}
+Y.~Liu, M.~Ott, N.~Goyal, J.~Du, M.~Joshi, D.~Chen, O.~Levy, M.~Lewis,
+  L.~Zettlemoyer, and V.~Stoyanov.
+\newblock Roberta: A robustly optimized bert pretraining approach.
+\newblock \emph{arXiv preprint arXiv:1907.11692}, 2019.
+
+\bibitem[Magai and Ayzenberg(2022)]{magai2022topology}
+G.~Magai and A.~Ayzenberg.
+\newblock Topology and geometry of data manifold in deep learning.
+\newblock \emph{arXiv preprint arXiv: 2204.08624}, 2022.
+
+\bibitem[Mitchell et~al.(2023)Mitchell, Lee, Khazatsky, Manning, and
+  Finn]{mitchell2023detectgpt}
+E.~Mitchell, Y.~Lee, A.~Khazatsky, C.~D. Manning, and C.~Finn.
+\newblock {DetectGPT}: Zero-shot machine-generated text detection using
+  probability curvature.
+\newblock \emph{arXiv preprint arXiv:2301.11305}, 2023.
+
+\bibitem[OpenAI(2023)]{OpenAIDetector}
+OpenAI.
+\newblock {AI} text classifier, 2023.
+\newblock URL \url{https://platform.openai.com/ai-text-classifier}.
+\newblock Accessed: 2023-05-16.
+
+\bibitem[Pope et~al.(2021)Pope, Zhu, Abdelkader, Goldblum, and
+  Goldstein]{pope2021the}
+P.~Pope, C.~Zhu, A.~Abdelkader, M.~Goldblum, and T.~Goldstein.
+\newblock The intrinsic dimension of images and its impact on learning.
+\newblock In \emph{International Conference on Learning Representations}, 2021.
+\newblock URL \url{https://openreview.net/forum?id=XJk19XzGq2J}.
+
+\bibitem[Radford et~al.(2019)Radford, Wu, Child, Luan, Amodei, and
+  Sutskever]{radford2019language}
+A.~Radford, J.~Wu, R.~Child, D.~Luan, D.~Amodei, and I.~Sutskever.
+\newblock Language models are unsupervised multitask learners.
+\newblock 2019.
+
+\bibitem[Sadasivan et~al.(2023)Sadasivan, Kumar, Balasubramanian, Wang, and
+  Feizi]{sadasivan2023can}
+V.~S. Sadasivan, A.~Kumar, S.~Balasubramanian, W.~Wang, and S.~Feizi.
+\newblock Can ai-generated text be reliably detected?
+\newblock \emph{arXiv preprint arXiv:2303.11156}, 2023.
+
+\bibitem[Schweinhart(2021)]{schweinhart2021persistent}
+B.~Schweinhart.
+\newblock Persistent homology and the upper box dimension.
+\newblock \emph{Discrete \& Computational Geometry}, 65\penalty0 (2):\penalty0
+  331--364, 2021.
+
+\bibitem[Solaiman et~al.(2019)Solaiman, Brundage, Clark, Askell, Herbert-Voss,
+  Wu, Radford, Krueger, Kim, Kreps, et~al.]{solaiman2019release}
+I.~Solaiman, M.~Brundage, J.~Clark, A.~Askell, A.~Herbert-Voss, J.~Wu,
+  A.~Radford, G.~Krueger, J.~W. Kim, S.~Kreps, et~al.
+\newblock Release strategies and the social impacts of language models.
+\newblock \emph{arXiv preprint arXiv:1908.09203}, 2019.
+
+\bibitem[Steele(1988)]{steele1988growth}
+J.~M. Steele.
+\newblock Growth rates of euclidean minimal spanning trees with power weighted
+  edges.
+\newblock \emph{The Annals of Probability}, 16\penalty0 (4):\penalty0
+  1767--1787, 1988.
+
+\bibitem[Stokel-Walker(2022)]{stokel2022ai}
+C.~Stokel-Walker.
+\newblock {AI} bot {ChatGPT} writes smart essays-should academics worry?
+\newblock \emph{Nature}, 2022.
+
+\bibitem[Tian(2023)]{GPTZeroDetector}
+E.~Tian.
+\newblock {GPTZero}: An {AI} text detector, 2023.
+\newblock URL \url{https://gptzero.me/}.
+\newblock Accessed: 2023-05-16.
+
+\bibitem[Tulchinskii et~al.(2023)Tulchinskii, Kuznetsov, Kushnareva,
+  Cherniavskii, Barannikov, Piontkovskaya, Nikolenko, and
+  Burnaev]{tulchinskii2022topological}
+E.~Tulchinskii, K.~Kuznetsov, L.~Kushnareva, D.~Cherniavskii, S.~Barannikov,
+  I.~Piontkovskaya, S.~Nikolenko, and E.~Burnaev.
+\newblock Topological data analysis for speech processing.
+\newblock In \emph{Proc. INTERSPEECH 2023}, pages 311--315, 2023.
+\newblock \doi{10.21437/Interspeech.2023-1861}.
+\newblock URL
+  \url{https://www.isca-speech.org/archive/interspeech_2023/tulchinskii23_interspeech.html}.
+
+\bibitem[Valeriani et~al.(2023)Valeriani, Doimo, Cuturello, Laio, Ansuini, and
+  Cazzaniga]{Valeriani-et-al-2023}
+L.~Valeriani, D.~Doimo, F.~Cuturello, A.~Laio, A.~Ansuini, and A.~Cazzaniga.
+\newblock The geometry of hidden representations of large transformer models.
+\newblock \emph{CoRR}, abs/2302.00294, 2023.
+\newblock URL \url{https://doi.org/10.48550/arXiv.2302.00294}.
+
+\bibitem[Vaswani et~al.(2017)Vaswani, Shazeer, Parmar, Uszkoreit, Jones, Gomez,
+  Kaiser, and Polosukhin]{NIPS2017_3f5ee243}
+A.~Vaswani, N.~Shazeer, N.~Parmar, J.~Uszkoreit, L.~Jones, A.~N. Gomez,
+  L.~Kaiser, and I.~Polosukhin.
+\newblock Attention is all you need.
+\newblock In I.~Guyon, U.~V. Luxburg, S.~Bengio, H.~Wallach, R.~Fergus,
+  S.~Vishwanathan, and R.~Garnett, editors, \emph{Advances in Neural
+  Information Processing Systems}, volume~30. Curran Associates, Inc., 2017.
+\newblock URL
+  \url{https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf}.
+
+\bibitem[Xue et~al.(2022)Xue, Yang, Qi, and Xin]{xue2022searching}
+F.~Xue, B.~Yang, Y.~Qi, and J.~Xin.
+\newblock Searching intrinsic dimensions of vision transformers.
+\newblock \emph{arXiv preprint arXiv: 2204.07722}, 2022.
+
+\bibitem[Zellers et~al.(2019)Zellers, Holtzman, Rashkin, Bisk, Farhadi,
+  Roesner, and Choi]{zellers2019defending}
+R.~Zellers, A.~Holtzman, H.~Rashkin, Y.~Bisk, A.~Farhadi, F.~Roesner, and
+  Y.~Choi.
+\newblock Defending against neural fake news.
+\newblock \emph{Advances in neural information processing systems}, 32, 2019.
+
+\bibitem[Zhu et~al.(2018)Zhu, Qiu, Huang, Calderbank, Sapiro, and
+  Daubechies]{8578388}
+W.~Zhu, Q.~Qiu, J.~Huang, R.~Calderbank, G.~Sapiro, and I.~Daubechies.
+\newblock Ldmnet: Low dimensional manifold regularized neural networks.
+\newblock In \emph{2018 IEEE/CVF Conference on Computer Vision and Pattern
+  Recognition}, pages 2743--2751, 2018.
+\newblock \doi{10.1109/CVPR.2018.00290}.
+
+\end{thebibliography}

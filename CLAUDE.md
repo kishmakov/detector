@@ -1,20 +1,31 @@
-This is a project for Google Chrome extension which analyzes the text.
+# About
 
-## Single Source of Truth
+This is a project for https://arxiv.org/abs/2306.04723 exploration
 
-The server IP lives in one place: **`config.sh`** at the repo root.
+# Paper
 
-```bash
-SERVER_URL="http://35.209.211.6:8000"
-```
+Latex sources of the main paper are located in `main_paper_src` directory.
+Some source codes and data used in paper located in `main_paper_data` directory.
 
-To change the IP: edit `config.sh`, then run `bash chrome/scripts/build.sh` to regenerate `chrome/config.js`. Shell scripts source `config.sh` directly.
+# Application
 
-## Project Structure
+For simplicity of experimentation, there is a server app and browser extension.
 
-The `server/` directory contains a Python + FastAPI backend. The `chrome/` directory contains the Chrome extension.
+## Application Structure
+
+### Config
+
+Server IP is stored in `config.sh` at the repo root.
+
+When changed, run `bash chrome/scripts/build.sh` to regenerate `chrome/config.js`. Shell scripts source `config.sh` directly.
+
+| Variable | Default | Description |
+|---|---|---|
+| `DETECTOR_BASE_URL` | value from `config.sh` | Base URL of the deployed service, used by live tests |
 
 ### `server/`
+
+The `server/` directory contains a Python + FastAPI backend.
 
 - **Stack:** Python 3.11, FastAPI, Uvicorn, Pydantic v2
 - **Venv:** `server/.venv/` — activate with `source .venv/bin/activate` or run directly via `.venv/bin/pytest`, `.venv/bin/uvicorn`
@@ -22,12 +33,6 @@ The `server/` directory contains a Python + FastAPI backend. The `chrome/` direc
 - **Run tests (local):** `.venv/bin/pytest tests/test_analyze.py -v`
 - **Run tests (live):** `bash scripts/test_live.sh` — hits the deployed service at `DETECTOR_BASE_URL`
 - **Deploy:** `bash scripts/deploy.sh` — rsyncs to remote host aliased `GC` in `~/.ssh/config`, builds Docker image on remote, manages via systemd unit
-
-#### Config
-
-| Variable | Default | Description |
-|---|---|---|
-| `DETECTOR_BASE_URL` | value from `config.sh` | Base URL of the deployed service, used by live tests |
 
 #### Layout
 
@@ -62,6 +67,8 @@ server/
 Swap `FROM` in `Dockerfile` to `nvidia/cuda:12.1.0-cudnn8-runtime-ubuntu22.04`, add `--gpus all` to the systemd unit's `docker run` command, then load the model in the `lifespan` hook (`app.state.model`).
 
 ### `chrome/`
+
+The `chrome/` directory contains the Chrome extension.
 
 - **Load unpacked:** `chrome://extensions` → Developer mode → Load unpacked → select `chrome/`
 - **Update IP:** edit `config.sh` → `bash chrome/scripts/build.sh` → reload extension in Chrome
