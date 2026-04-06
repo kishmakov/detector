@@ -1,5 +1,5 @@
 """
-Reproduce Table 2 from "Intrinsic Dimension Estimation for Robust Detection of AI-Generated Texts"
+Reproduce Table 3 from "Intrinsic Dimension Estimation for Robust Detection of AI-Generated Texts"
 (arxiv 2306.04723)
 
 Reproduces:
@@ -7,7 +7,7 @@ Reproduces:
   - Cross-domain accuracy matrix (PHD column, GPT-3.5 generator)
 
 Usage:
-    python reproduce.py --model-path roberta-base --n-samples 500 --data-dir data/
+    python reproduce.py --n-samples 500
 """
 
 import argparse
@@ -66,7 +66,7 @@ def compute_phd_array(texts, tokenizer, model, desc=""):
 
 
 def load_texts(path, n_samples=None):
-    # Each file is a single JSON array (not JSONL)
+    # Each file is a single JSON array
     df = pd.read_json(path)
     human = df['gold_completion'].tolist()
     gen = df['gen_completion'].apply(lambda x: x[0] if isinstance(x, list) else x).tolist()
@@ -76,17 +76,13 @@ def load_texts(path, n_samples=None):
     return human[:n], gen[:n]
 
 
-def cache_path(data_path, suffix):
-    return data_path + f'.phd_{suffix}.npy'
-
-
 def load_or_compute(texts, data_path, suffix, tokenizer, model, force=False):
-    cp = cache_path(data_path, suffix)
-    if not force and os.path.exists(cp):
-        print(f"  Loading cached PHD from {cp}")
-        return np.load(cp)
+    cached_path = data_path + f'.phd_{suffix}.npy'
+    if not force and os.path.exists(cached_path):
+        print(f"  Loading cached PHD from {cached_path}")
+        return np.load(cached_path)
     dims = compute_phd_array(texts, tokenizer, model, desc=f"  PHD [{suffix}]")
-    np.save(cp, dims)
+    np.save(cached_path, dims)
     return dims
 
 
@@ -136,18 +132,15 @@ def print_table(title, row_labels, col_labels, matrix):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Reproduce Table 2 of PHD paper")
-    parser.add_argument('--model-path', default='roberta-base',
-                        help='HuggingFace model name or local path (default: roberta-base)')
-    parser.add_argument('--data-dir', default='data',
-                        help='Directory containing the .json_pp data files')
+    parser = argparse.ArgumentParser(description="Reproduce Table 3 of PHD paper")
     parser.add_argument('--n-samples', type=int, default=500,
                         help='Max samples per class per dataset (default: 500)')
     parser.add_argument('--force-recompute', action='store_true',
                         help='Ignore cached PHD .npy files and recompute')
     args = parser.parse_args()
 
-    data_dir = args.data_dir
+    model_path = "roberta-base"
+    data_dir = "/home/kishmakov/Repos/shad/detector/main_paper_data/data"
     if not os.path.isdir(data_dir):
         sys.exit(f"Data directory not found: {data_dir}")
 
@@ -163,9 +156,9 @@ def main():
         if not os.path.exists(path):
             sys.exit(f"Missing data file: {path}")
 
-    print(f"Loading tokenizer and model: {args.model_path}")
-    tokenizer = AutoTokenizer.from_pretrained(args.model_path)
-    model = AutoModel.from_pretrained(args.model_path)
+    print(f"Loading tokenizer and model: {model_path}")
+    tokenizer = AutoTokenizer.from_pretrained(model_path)
+    model = AutoModel.from_pretrained(model_path)
     model.eval()
 
     # ------------------------------------------------------------------ #
@@ -191,7 +184,7 @@ def main():
         print(f"  PHD mean — human: {h_mean:.2f}, AI: {g_mean:.2f}")
 
     # ------------------------------------------------------------------ #
-    # Step 2: Cross-model accuracy (Wikipedia domain, Table 2 lower)
+    # Step 2: Cross-model accuracy (Wikipedia domain, Table 3 lower)
     # ------------------------------------------------------------------ #
     wiki_keys   = ['gpt2_wiki', 'opt_wiki', 'gpt35_wiki']
     wiki_labels = ['GPT-2', 'OPT', 'GPT-3.5']
@@ -214,12 +207,12 @@ def main():
         cross_model_matrix.append(row)
 
     print_table(
-        "Table 2 (lower): Cross-model accuracy — PHD classifier, Wikipedia domain",
+        "Table 3 (lower): Cross-model accuracy — PHD classifier, Wikipedia domain",
         wiki_labels, wiki_labels, cross_model_matrix
     )
 
     # ------------------------------------------------------------------ #
-    # Step 3: Cross-domain accuracy (GPT-3.5 generator, Table 2 upper)
+    # Step 3: Cross-domain accuracy (GPT-3.5 generator, Table 3 upper)
     # ------------------------------------------------------------------ #
     domain_keys   = ['gpt35_wiki', 'gpt35_reddit']
     domain_labels = ['Wikipedia', 'Reddit']
