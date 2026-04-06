@@ -1,0 +1,17 @@
+Table 3 (lower): Cross-model accuracy — PHD classifier, Wikipedia domain
+Train \ Eval             GPT-2           OPT       GPT-3.5
+----------------------------------------------------------
+GPT-2                    0.730         0.820         0.860
+OPT                      0.720         0.830         0.860
+GPT-3.5                  0.730         0.850         0.870
+
+
+Table 3 (upper, partial): Cross-domain accuracy — PHD classifier, GPT-3.5 generator
+Train \ Eval         Wikipedia        Reddit
+--------------------------------------------
+Wikipedia                0.870         0.737
+Reddit                   0.810         0.737
+
+Paper reference values (Table 3):
+  Cross-domain PHD: Wikipedia→Wikipedia 0.843, Reddit→Reddit 0.776, cross ~0.78–0.86
+  Cross-model PHD:  diagonal ~0.76–0.84, off-diagonal ~0.76–0.84 (very stable)
