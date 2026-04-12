@@ -1,0 +1,202 @@
+Multi-scale magnitude features — comparison benchmark
+n_samples=300, seed=42
+
+=================================================================
+Scenario: single slope
+n_samples=300, seed=42
+=================================================================
+
+Generating embeddings and computing features...
+
+[gpt2_wiki]  human_dim=9.0, ai_dim=7.0
+  gpt2_wiki/human: 0/300
+  gpt2_wiki/human: 50/300
+  gpt2_wiki/human: 100/300
+  gpt2_wiki/human: 150/300
+  gpt2_wiki/human: 200/300
+  gpt2_wiki/human: 250/300
+  gpt2_wiki/ai: 0/300
+  gpt2_wiki/ai: 50/300
+  gpt2_wiki/ai: 100/300
+  gpt2_wiki/ai: 150/300
+  gpt2_wiki/ai: 200/300
+  gpt2_wiki/ai: 250/300
+  slope_overall — human: 0.7313, AI: 0.7214, Δ=0.0099
+
+[opt_wiki]  human_dim=9.0, ai_dim=7.5
+  opt_wiki/human: 0/300
+  opt_wiki/human: 50/300
+  opt_wiki/human: 100/300
+  opt_wiki/human: 150/300
+  opt_wiki/human: 200/300
+  opt_wiki/human: 250/300
+  opt_wiki/ai: 0/300
+  opt_wiki/ai: 50/300
+  opt_wiki/ai: 100/300
+  opt_wiki/ai: 150/300
+  opt_wiki/ai: 200/300
+  opt_wiki/ai: 250/300
+  slope_overall — human: 0.7349, AI: 0.7279, Δ=0.0069
+
+[gpt35_wiki]  human_dim=9.0, ai_dim=8.0
+  gpt35_wiki/human: 0/300
+  gpt35_wiki/human: 50/300
+  gpt35_wiki/human: 100/300
+  gpt35_wiki/human: 150/300
+  gpt35_wiki/human: 200/300
+  gpt35_wiki/human: 250/300
+  gpt35_wiki/ai: 0/300
+  gpt35_wiki/ai: 50/300
+  gpt35_wiki/ai: 100/300
+  gpt35_wiki/ai: 150/300
+  gpt35_wiki/ai: 200/300
+  gpt35_wiki/ai: 250/300
+  slope_overall — human: 0.7343, AI: 0.7297, Δ=0.0046
+
+[gpt35_reddit]  human_dim=9.0, ai_dim=8.0
+  gpt35_reddit/human: 0/300
+  gpt35_reddit/human: 50/300
+  gpt35_reddit/human: 100/300
+  gpt35_reddit/human: 150/300
+  gpt35_reddit/human: 200/300
+  gpt35_reddit/human: 250/300
+  gpt35_reddit/ai: 0/300
+  gpt35_reddit/ai: 50/300
+  gpt35_reddit/ai: 100/300
+  gpt35_reddit/ai: 150/300
+  gpt35_reddit/ai: 200/300
+  gpt35_reddit/ai: 250/300
+  slope_overall — human: 0.6771, AI: 0.6740, Δ=0.0030
+
+Cross-model accuracy — single slope, Wikipedia domain:
+Train \ Eval               GPT-2           OPT       GPT-3.5
+------------------------------------------------------------
+GPT-2                      0.517         0.550         0.583
+OPT                        0.567         0.567         0.617
+GPT-3.5                    0.583         0.567         0.633
+
+Cross-domain accuracy — single slope, GPT-3.5 generator:
+Train \ Eval           Wikipedia        Reddit
+----------------------------------------------
+Wikipedia                  0.633         0.517
+Reddit                     0.483         0.550
+
+=================================================================
+Scenario: multi-scale (6-dim)
+n_samples=300, seed=42
+=================================================================
+
+Generating embeddings and computing features...
+
+[gpt2_wiki]  human_dim=9.0, ai_dim=7.0
+  gpt2_wiki/human: 0/300
+  gpt2_wiki/human: 50/300
+  gpt2_wiki/human: 100/300
+  gpt2_wiki/human: 150/300
+  gpt2_wiki/human: 200/300
+  gpt2_wiki/human: 250/300
+  gpt2_wiki/ai: 0/300
+  gpt2_wiki/ai: 50/300
+  gpt2_wiki/ai: 100/300
+  gpt2_wiki/ai: 150/300
+  gpt2_wiki/ai: 200/300
+  gpt2_wiki/ai: 250/300
+  Feature deltas (human − AI):
+    slope_fine     : -0.0010
+    slope_medium   : -0.0003
+    slope_coarse   : +0.0427
+    slope_overall  : +0.0099
+    curvature      : +0.0051
+    log_mag_mid    : -0.0047
+
+[opt_wiki]  human_dim=9.0, ai_dim=7.5
+  opt_wiki/human: 0/300
+  opt_wiki/human: 50/300
+  opt_wiki/human: 100/300
+  opt_wiki/human: 150/300
+  opt_wiki/human: 200/300
+  opt_wiki/human: 250/300
+  opt_wiki/ai: 0/300
+  opt_wiki/ai: 50/300
+  opt_wiki/ai: 100/300
+  opt_wiki/ai: 150/300
+  opt_wiki/ai: 200/300
+  opt_wiki/ai: 250/300
+  Feature deltas (human − AI):
+    slope_fine     : -0.0008
+    slope_medium   : -0.0006
+    slope_coarse   : +0.0310
+    slope_overall  : +0.0069
+    curvature      : +0.0037
+    log_mag_mid    : -0.0038
+
+[gpt35_wiki]  human_dim=9.0, ai_dim=8.0
+  gpt35_wiki/human: 0/300
+  gpt35_wiki/human: 50/300
+  gpt35_wiki/human: 100/300
+  gpt35_wiki/human: 150/300
+  gpt35_wiki/human: 200/300
+  gpt35_wiki/human: 250/300
+  gpt35_wiki/ai: 0/300
+  gpt35_wiki/ai: 50/300
+  gpt35_wiki/ai: 100/300
+  gpt35_wiki/ai: 150/300
+  gpt35_wiki/ai: 200/300
+  gpt35_wiki/ai: 250/300
+  Feature deltas (human − AI):
+    slope_fine     : -0.0004
+    slope_medium   : -0.0000
+    slope_coarse   : +0.0194
+    slope_overall  : +0.0046
+    curvature      : +0.0023
+    log_mag_mid    : -0.0018
+
+[gpt35_reddit]  human_dim=9.0, ai_dim=8.0
+  gpt35_reddit/human: 0/300
+  gpt35_reddit/human: 50/300
+  gpt35_reddit/human: 100/300
+  gpt35_reddit/human: 150/300
+  gpt35_reddit/human: 200/300
+  gpt35_reddit/human: 250/300
+  gpt35_reddit/ai: 0/300
+  gpt35_reddit/ai: 50/300
+  gpt35_reddit/ai: 100/300
+  gpt35_reddit/ai: 150/300
+  gpt35_reddit/ai: 200/300
+  gpt35_reddit/ai: 250/300
+  Feature deltas (human − AI):
+    slope_fine     : -0.0009
+    slope_medium   : -0.0022
+    slope_coarse   : +0.0173
+    slope_overall  : +0.0030
+    curvature      : +0.0022
+    log_mag_mid    : -0.0053
+
+Cross-model accuracy — multi-scale (6-dim), Wikipedia domain:
+Train \ Eval               GPT-2           OPT       GPT-3.5
+------------------------------------------------------------
+GPT-2                      0.867         0.683         0.683
+OPT                        0.833         0.583         0.650
+GPT-3.5                    0.833         0.650         0.650
+
+Cross-domain accuracy — multi-scale (6-dim), GPT-3.5 generator:
+Train \ Eval           Wikipedia        Reddit
+----------------------------------------------
+Wikipedia                  0.650         0.617
+Reddit                     0.617         0.633
+
+=================================================================
+SUMMARY: diagonal accuracy (train = eval)
+=================================================================
+
+Dataset                 Single slope   Multi-scale     Delta
+------------------------------------------------------------
+GPT-2                          0.517         0.867    +0.350
+OPT                            0.567         0.583    +0.017
+GPT-3.5                        0.633         0.650    +0.017
+Wikipedia                      0.633         0.650    +0.017
+Reddit                         0.550         0.633    +0.083
+
+PHD baseline (run_results_02.txt — real data):
+  Cross-model:  GPT-2 0.730, OPT 0.830, GPT-3.5 0.870
+  Cross-domain: Wikipedia 0.870, Reddit 0.737
