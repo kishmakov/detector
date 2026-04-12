@@ -1,0 +1,88 @@
+=================================================================
+Magnitude-based AI text detection — synthetic benchmark
+n_samples=300, seed=42
+=================================================================
+
+Generating embeddings and computing magnitude dimensions...
+
+[gpt2_wiki]  human_dim=9.0, ai_dim=7.0, tokens=(80, 200), dim_std=0.8, ambient=30
+  gpt2_wiki/human: 0/300
+  gpt2_wiki/human: 50/300
+  gpt2_wiki/human: 100/300
+  gpt2_wiki/human: 150/300
+  gpt2_wiki/human: 200/300
+  gpt2_wiki/human: 250/300
+  gpt2_wiki/ai: 0/300
+  gpt2_wiki/ai: 50/300
+  gpt2_wiki/ai: 100/300
+  gpt2_wiki/ai: 150/300
+  gpt2_wiki/ai: 200/300
+  gpt2_wiki/ai: 250/300
+  Magnitude dim — human: 0.7320, AI: 0.7221, Δ = 0.0099
+
+[opt_wiki]  human_dim=9.0, ai_dim=7.5, tokens=(80, 200), dim_std=0.8, ambient=30
+  opt_wiki/human: 0/300
+  opt_wiki/human: 50/300
+  opt_wiki/human: 100/300
+  opt_wiki/human: 150/300
+  opt_wiki/human: 200/300
+  opt_wiki/human: 250/300
+  opt_wiki/ai: 0/300
+  opt_wiki/ai: 50/300
+  opt_wiki/ai: 100/300
+  opt_wiki/ai: 150/300
+  opt_wiki/ai: 200/300
+  opt_wiki/ai: 250/300
+  Magnitude dim — human: 0.7355, AI: 0.7286, Δ = 0.0069
+
+[gpt35_wiki]  human_dim=9.0, ai_dim=8.0, tokens=(80, 200), dim_std=0.8, ambient=30
+  gpt35_wiki/human: 0/300
+  gpt35_wiki/human: 50/300
+  gpt35_wiki/human: 100/300
+  gpt35_wiki/human: 150/300
+  gpt35_wiki/human: 200/300
+  gpt35_wiki/human: 250/300
+  gpt35_wiki/ai: 0/300
+  gpt35_wiki/ai: 50/300
+  gpt35_wiki/ai: 100/300
+  gpt35_wiki/ai: 150/300
+  gpt35_wiki/ai: 200/300
+  gpt35_wiki/ai: 250/300
+  Magnitude dim — human: 0.7349, AI: 0.7304, Δ = 0.0046
+
+[gpt35_reddit]  human_dim=9.0, ai_dim=8.0, tokens=(40, 120), dim_std=1.2, ambient=30
+  gpt35_reddit/human: 0/300
+  gpt35_reddit/human: 50/300
+  gpt35_reddit/human: 100/300
+  gpt35_reddit/human: 150/300
+  gpt35_reddit/human: 200/300
+  gpt35_reddit/human: 250/300
+  gpt35_reddit/ai: 0/300
+  gpt35_reddit/ai: 50/300
+  gpt35_reddit/ai: 100/300
+  gpt35_reddit/ai: 150/300
+  gpt35_reddit/ai: 200/300
+  gpt35_reddit/ai: 250/300
+  Magnitude dim — human: 0.6772, AI: 0.6742, Δ = 0.0030
+
+
+Cross-model accuracy — Magnitude, Wikipedia domain (synthetic)
+Train \ Eval                 GPT-2             OPT         GPT-3.5
+------------------------------------------------------------------
+GPT-2                        0.517           0.550           0.583
+OPT                          0.567           0.567           0.617
+GPT-3.5                      0.583           0.567           0.633
+
+
+Cross-domain accuracy — Magnitude, GPT-3.5 generator (synthetic)
+Train \ Eval             Wikipedia          Reddit
+--------------------------------------------------
+Wikipedia                    0.633           0.517
+Reddit                       0.483           0.550
+
+PHD baseline (run_results_02.txt — real data):
+  Cross-model:  GPT-2→GPT-2 0.730, OPT→OPT 0.830, GPT-3.5→GPT-3.5 0.870
+  Cross-domain: Wikipedia→Wikipedia 0.870, Reddit→Reddit 0.737
+
+Note: synthetic benchmark uses linear manifold embeddings (X = Z@A + noise)
+Results should be directionally consistent with real-data runs.

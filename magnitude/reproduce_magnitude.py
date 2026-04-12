@@ -20,6 +20,8 @@ import torch
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 from transformers import AutoModel, AutoTokenizer
 from tqdm import tqdm
 
@@ -109,7 +111,7 @@ def split_data(X, y, val_size=0.1, test_size=0.1, seed=42):
 
 
 def train_classifier(X_train, y_train):
-    clf = LogisticRegression()
+    clf = make_pipeline(StandardScaler(), LogisticRegression(C=1.0))
     clf.fit(X_train, y_train)
     return clf
 
