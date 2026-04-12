@@ -4,10 +4,13 @@ of AI-Generated Texts" (arxiv 2306.04723) using the magnitude-based dimension
 estimator instead of PHD.
 
 Structure mirrors main_paper_data/reproduce.py so results are directly
-comparable.
+comparable.  Computes both scalar (single log-log slope) and multi-scale
+(6-dim) features in a single RoBERTa forward pass per text, then evaluates
+both classifiers.
 
 Usage:
     python reproduce_magnitude.py --n-samples 500
+    python reproduce_magnitude.py --n-samples 500 --force-recompute
 """
 
 import argparse
@@ -29,42 +32,47 @@ sys.path.insert(0, os.path.dirname(__file__))
 from magnitude import MagnitudeEstimator
 
 MIN_TOKENS = 40   # skip texts with fewer usable tokens
+FEAT_NAMES = ['slope_fine', 'slope_medium', 'slope_coarse',
+              'slope_overall', 'curvature', 'log_mag_mid']
 
 
 def preprocess_text(text: str) -> str:
     return text.replace('\n', ' ').replace('  ', ' ')
 
 
-def get_magnitude_single(text: str, estimator: MagnitudeEstimator,
-                         tokenizer, model) -> float:
+def process_texts(texts, tokenizer, model, desc='') -> tuple[np.ndarray, np.ndarray]:
     """
-    Tokenise text with roberta-base, extract token embeddings, compute
-    magnitude dimension.  Returns nan for texts that are too short.
+    Run RoBERTa once per text; return (scalars, feature_matrix).
+    scalars       : (N,) float array of single log-log slope
+    feature_matrix: (N, 6) float array of multi-scale features
     """
-    inputs = tokenizer(
-        preprocess_text(text),
-        truncation=True,
-        max_length=512,
-        return_tensors='pt',
-    )
-    with torch.no_grad():
-        outp = model(**inputs)
-
-    # Drop CLS and SEP tokens (first and last)
-    embeddings = outp[0][0].numpy()[1:-1]   # (n_tokens, 768)
-
-    if embeddings.shape[0] < MIN_TOKENS:
-        return float('nan')
-
-    return estimator.fit_transform(embeddings)
-
-
-def compute_magnitude_array(texts, tokenizer, model, desc='') -> np.ndarray:
     estimator = MagnitudeEstimator()
-    dims = []
+    scalars = []
+    features = []
+
     for text in tqdm(texts, desc=desc):
-        dims.append(get_magnitude_single(text, estimator, tokenizer, model))
-    return np.array(dims, dtype=float)
+        inputs = tokenizer(
+            preprocess_text(text),
+            truncation=True,
+            max_length=512,
+            return_tensors='pt',
+        )
+        with torch.no_grad():
+            outp = model(**inputs)
+
+        emb = outp[0][0].numpy()[1:-1]   # drop CLS and SEP
+
+        if emb.shape[0] < MIN_TOKENS:
+            scalars.append(float('nan'))
+            features.append(np.full(6, np.nan))
+        else:
+            scalars.append(estimator.fit_transform(emb))
+            features.append(estimator.magnitude_features(emb))
+
+    return (
+        np.array(scalars, dtype=float),
+        np.array(features, dtype=float),
+    )
 
 
 def load_texts(path: str, n_samples: int | None = None):
@@ -80,67 +88,126 @@ def load_texts(path: str, n_samples: int | None = None):
 
 
 def load_or_compute(texts, data_path: str, suffix: str,
-                    tokenizer, model, force: bool = False) -> np.ndarray:
-    cached = data_path + f'.mag_{suffix}.npy'
-    if not force and os.path.exists(cached):
-        print(f'  Loading cached magnitude from {cached}')
-        return np.load(cached)
-    dims = compute_magnitude_array(texts, tokenizer, model,
-                                   desc=f'  Magnitude [{suffix}]')
-    np.save(cached, dims)
-    return dims
+                    tokenizer, model, force: bool = False):
+    scalar_path = data_path + f'.mag_{suffix}.npy'
+    feat_path   = data_path + f'.magfeat_{suffix}.npy'
+    if not force and os.path.exists(scalar_path) and os.path.exists(feat_path):
+        print(f'  Loading cached from {scalar_path}')
+        return np.load(scalar_path), np.load(feat_path)
+    scalars, feats = process_texts(texts, tokenizer, model, desc=f'  [{suffix}]')
+    np.save(scalar_path, scalars)
+    np.save(feat_path,   feats)
+    return scalars, feats
 
 
-def build_xy(human_dims: np.ndarray, gen_dims: np.ndarray):
-    h = human_dims[~np.isnan(human_dims)]
-    g = gen_dims[~np.isnan(gen_dims)]
+# ---------------------------------------------------------------------------
+# Build (X, y) helpers
+# ---------------------------------------------------------------------------
+
+def build_xy_scalar(human_scalars, gen_scalars):
+    h = human_scalars[~np.isnan(human_scalars)]
+    g = gen_scalars[~np.isnan(gen_scalars)]
     n = min(len(h), len(g))
-    h, g = h[:n], g[:n]
-    X = np.concatenate([h, g]).reshape(-1, 1)
+    X = np.concatenate([h[:n], g[:n]]).reshape(-1, 1)
+    y = np.array([1] * n + [0] * n)
+    return X, y
+
+
+def build_xy_multiscale(human_feats, gen_feats):
+    h = human_feats[~np.any(np.isnan(human_feats), axis=1)]
+    g = gen_feats[~np.any(np.isnan(gen_feats), axis=1)]
+    n = min(len(h), len(g))
+    X = np.vstack([h[:n], g[:n]])
     y = np.array([1] * n + [0] * n)
     return X, y
 
 
 def split_data(X, y, val_size=0.1, test_size=0.1, seed=42):
-    X_train, X_tmp, y_train, y_tmp = train_test_split(
+    X_tr, X_tmp, y_tr, y_tmp = train_test_split(
         X, y, test_size=val_size + test_size, random_state=seed)
     split = test_size / (val_size + test_size)
-    X_val, X_test, y_val, y_test = train_test_split(
+    X_val, X_te, y_val, y_te = train_test_split(
         X_tmp, y_tmp, test_size=split, random_state=seed)
-    return X_train, X_val, X_test, y_train, y_val, y_test
+    return X_tr, X_val, X_te, y_tr, y_val, y_te
 
 
-def train_classifier(X_train, y_train):
-    clf = make_pipeline(StandardScaler(), LogisticRegression(C=1.0))
+def train_eval(X_train, y_train, X_test, y_test) -> float:
+    clf = make_pipeline(StandardScaler(), LogisticRegression(C=1.0, max_iter=1000))
     clf.fit(X_train, y_train)
-    return clf
-
-
-def evaluate(clf, X_test, y_test) -> float:
     return accuracy_score(y_test, clf.predict(X_test))
 
+
+# ---------------------------------------------------------------------------
+# Table printing
+# ---------------------------------------------------------------------------
 
 def print_table(title, row_labels, col_labels, matrix):
     print(f'\n{title}')
     col_w = 14
-    header = f"{'Train \\ Eval':<16}" + ''.join(f'{c:>{col_w}}' for c in col_labels)
+    row_hdr = 'Train \\ Eval'
+    header = f'{row_hdr:<16}' + ''.join(f'{c:>{col_w}}' for c in col_labels)
     print(header)
     print('-' * len(header))
-    for row_label, row in zip(row_labels, matrix):
-        vals = ''.join(
-            f'{v:>{col_w}.3f}' if v is not None else f'{"—":>{col_w}}'
-            for v in row
-        )
-        print(f'{row_label:<16}{vals}')
+    for label, row in zip(row_labels, matrix):
+        vals = ''.join(f'{v:>{col_w}.3f}' for v in row)
+        print(f'{label:<16}{vals}')
 
+
+# ---------------------------------------------------------------------------
+# Cross-model / cross-domain evaluation
+# ---------------------------------------------------------------------------
+
+def evaluate_mode(data, build_xy_fn, wiki_keys, wiki_labels,
+                  domain_keys, domain_labels, title_prefix):
+    # Cross-model (Wikipedia)
+    splits = {}
+    for key in wiki_keys:
+        X, y = build_xy_fn(data[key]['human'], data[key]['gen'])
+        X_tr, _, X_te, y_tr, _, y_te = split_data(X, y)
+        splits[key] = (X_tr, y_tr, X_te, y_te)
+
+    cm = []
+    for tr_key in wiki_keys:
+        X_tr, y_tr, _, _ = splits[tr_key]
+        row = []
+        for ev_key in wiki_keys:
+            _, _, X_te, y_te = splits[ev_key]
+            row.append(train_eval(X_tr, y_tr, X_te, y_te))
+        cm.append(row)
+    print_table(f'Cross-model accuracy — {title_prefix}, Wikipedia domain',
+                wiki_labels, wiki_labels, cm)
+
+    # Cross-domain (GPT-3.5)
+    dom_splits = {}
+    for key in domain_keys:
+        X, y = build_xy_fn(data[key]['human'], data[key]['gen'])
+        X_tr, _, X_te, y_tr, _, y_te = split_data(X, y)
+        dom_splits[key] = (X_tr, y_tr, X_te, y_te)
+
+    cd = []
+    for tr_key in domain_keys:
+        X_tr, y_tr, _, _ = dom_splits[tr_key]
+        row = []
+        for ev_key in domain_keys:
+            _, _, X_te, y_te = dom_splits[ev_key]
+            row.append(train_eval(X_tr, y_tr, X_te, y_te))
+        cd.append(row)
+    print_table(f'\nCross-domain accuracy — {title_prefix}, GPT-3.5 generator',
+                domain_labels, domain_labels, cd)
+
+    return cm, cd
+
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
 
 def main():
     parser = argparse.ArgumentParser(
         description='Reproduce Table 3 using magnitude dimension instead of PHD')
     parser.add_argument('--n-samples', type=int, default=500)
     parser.add_argument('--force-recompute', action='store_true')
-    parser.add_argument('--data-dir', default=None,
-                        help='Path to data directory (default: sibling of this file)')
+    parser.add_argument('--data-dir', default=None)
     args = parser.parse_args()
 
     data_dir = args.data_dir or os.path.join(
@@ -161,97 +228,81 @@ def main():
         if not os.path.exists(path):
             sys.exit(f'Missing data file: {path}')
 
-    model_path = 'roberta-base'
-    print(f'Loading tokenizer and model: {model_path}')
-    tokenizer = AutoTokenizer.from_pretrained(model_path)
-    model = AutoModel.from_pretrained(model_path)
+    print('Loading tokenizer and model: roberta-base')
+    tokenizer = AutoTokenizer.from_pretrained('roberta-base')
+    model = AutoModel.from_pretrained('roberta-base')
     model.eval()
 
-    # ------------------------------------------------------------------ #
-    # Step 1: compute (or load cached) magnitude dimension arrays
-    # ------------------------------------------------------------------ #
-    print(f'\nComputing magnitude dimension for up to {args.n_samples} samples per class...')
-
-    mag = {}
-    for key, path in files.items():
-        print(f'\n[{key}] Loading {path}')
-        human_texts, gen_texts = load_texts(path, n_samples=args.n_samples)
-        print(f'  {len(human_texts)} human, {len(gen_texts)} AI texts')
-
-        mag[key] = {
-            'human': load_or_compute(
-                human_texts, path, f'human_n{args.n_samples}',
-                tokenizer, model, force=args.force_recompute),
-            'gen': load_or_compute(
-                gen_texts, path, f'gen_n{args.n_samples}',
-                tokenizer, model, force=args.force_recompute),
-        }
-
-        h_mean = np.nanmean(mag[key]['human'])
-        g_mean = np.nanmean(mag[key]['gen'])
-        print(f'  Magnitude dim mean — human: {h_mean:.3f}, AI: {g_mean:.3f}')
-
-    # ------------------------------------------------------------------ #
-    # Step 2: Cross-model accuracy (Wikipedia domain)
-    # ------------------------------------------------------------------ #
     wiki_keys   = ['gpt2_wiki', 'opt_wiki', 'gpt35_wiki']
     wiki_labels = ['GPT-2', 'OPT', 'GPT-3.5']
-
-    splits = {}
-    for key in wiki_keys:
-        X, y = build_xy(mag[key]['human'], mag[key]['gen'])
-        X_train, X_val, X_test, y_train, y_val, y_test = split_data(X, y)
-        splits[key] = dict(X_train=X_train, X_val=X_val, X_test=X_test,
-                           y_train=y_train, y_val=y_val, y_test=y_test)
-
-    cross_model_matrix = []
-    for train_key in wiki_keys:
-        row = []
-        clf = train_classifier(splits[train_key]['X_train'],
-                               splits[train_key]['y_train'])
-        for eval_key in wiki_keys:
-            acc = evaluate(clf, splits[eval_key]['X_test'],
-                           splits[eval_key]['y_test'])
-            row.append(acc)
-        cross_model_matrix.append(row)
-
-    print_table(
-        'Cross-model accuracy — Magnitude classifier, Wikipedia domain',
-        wiki_labels, wiki_labels, cross_model_matrix,
-    )
-
-    # ------------------------------------------------------------------ #
-    # Step 3: Cross-domain accuracy (GPT-3.5 generator)
-    # ------------------------------------------------------------------ #
     domain_keys   = ['gpt35_wiki', 'gpt35_reddit']
     domain_labels = ['Wikipedia', 'Reddit']
 
-    domain_splits = {}
-    for key in domain_keys:
-        X, y = build_xy(mag[key]['human'], mag[key]['gen'])
-        X_train, X_val, X_test, y_train, y_val, y_test = split_data(X, y)
-        domain_splits[key] = dict(X_train=X_train, X_val=X_val, X_test=X_test,
-                                  y_train=y_train, y_val=y_val, y_test=y_test)
+    scalars = {}
+    feats   = {}
 
-    cross_domain_matrix = []
-    for train_key in domain_keys:
-        row = []
-        clf = train_classifier(domain_splits[train_key]['X_train'],
-                               domain_splits[train_key]['y_train'])
-        for eval_key in domain_keys:
-            acc = evaluate(clf, domain_splits[eval_key]['X_test'],
-                           domain_splits[eval_key]['y_test'])
-            row.append(acc)
-        cross_domain_matrix.append(row)
+    print(f'\nProcessing up to {args.n_samples} samples per class...')
+    for key, path in files.items():
+        print(f'\n[{key}]')
+        human_texts, gen_texts = load_texts(path, n_samples=args.n_samples)
+        print(f'  {len(human_texts)} human, {len(gen_texts)} AI texts')
 
-    print_table(
-        '\nCross-domain accuracy — Magnitude classifier, GPT-3.5 generator',
-        domain_labels, domain_labels, cross_domain_matrix,
-    )
+        suffix = f'n{args.n_samples}'
+        h_sc, h_ft = load_or_compute(human_texts, path, f'human_{suffix}',
+                                     tokenizer, model, args.force_recompute)
+        g_sc, g_ft = load_or_compute(gen_texts,   path, f'gen_{suffix}',
+                                     tokenizer, model, args.force_recompute)
 
-    print('\nBaseline PHD results (from run_results_02.txt):')
-    print('  Cross-domain: Wikipedia→Wikipedia 0.870, Reddit→Reddit 0.737')
-    print('  Cross-model:  GPT-2→GPT-2 0.730, OPT→OPT 0.830, GPT-3.5→GPT-3.5 0.870')
+        scalars[key] = {'human': h_sc, 'gen': g_sc}
+        feats[key]   = {'human': h_ft, 'gen': g_ft}
+
+        h_mean = np.nanmean(h_sc)
+        g_mean = np.nanmean(g_sc)
+        print(f'  Scalar mag dim — human: {h_mean:.3f}, AI: {g_mean:.3f}, '
+              f'Δ={h_mean - g_mean:.3f}')
+
+        h_fmean = np.nanmean(h_ft, axis=0)
+        g_fmean = np.nanmean(g_ft, axis=0)
+        print('  Feature deltas (human − AI):')
+        for name, d in zip(FEAT_NAMES, h_fmean - g_fmean):
+            print(f'    {name:<15}: {d:+.4f}')
+
+    # ------------------------------------------------------------------ #
+    # Evaluate both modes
+    # ------------------------------------------------------------------ #
+    print('\n' + '=' * 65)
+    scalar_cm, scalar_cd = evaluate_mode(
+        scalars, build_xy_scalar,
+        wiki_keys, wiki_labels, domain_keys, domain_labels,
+        'Scalar magnitude')
+
+    print('\n' + '=' * 65)
+    multi_cm, multi_cd = evaluate_mode(
+        feats, build_xy_multiscale,
+        wiki_keys, wiki_labels, domain_keys, domain_labels,
+        'Multi-scale magnitude (6-dim)')
+
+    # ------------------------------------------------------------------ #
+    # Summary
+    # ------------------------------------------------------------------ #
+    print('\n' + '=' * 65)
+    print('SUMMARY — diagonal accuracy (train = eval on same dataset)')
+    print('=' * 65)
+    print(f'\n{"Dataset":<22}  {"Scalar":>10}  {"Multi-scale":>12}  {"Delta":>8}  '
+          f'{"PHD (real)":>12}')
+    print('-' * 72)
+    phd_diag = {'GPT-2': 0.730, 'OPT': 0.830, 'GPT-3.5': 0.870,
+                'Wikipedia': 0.870, 'Reddit': 0.737}
+    for i, label in enumerate(wiki_labels):
+        s = scalar_cm[i][i]
+        m = multi_cm[i][i]
+        p = phd_diag.get(label, float('nan'))
+        print(f'{label:<22}  {s:>10.3f}  {m:>12.3f}  {m - s:>+8.3f}  {p:>12.3f}')
+    for i, label in enumerate(domain_labels):
+        s = scalar_cd[i][i]
+        m = multi_cd[i][i]
+        p = phd_diag.get(label, float('nan'))
+        print(f'{label:<22}  {s:>10.3f}  {m:>12.3f}  {m - s:>+8.3f}  {p:>12.3f}')
 
 
 if __name__ == '__main__':
