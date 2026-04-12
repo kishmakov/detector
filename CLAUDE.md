@@ -1,6 +1,6 @@
 # About
 
-This is a project for https://arxiv.org/abs/2306.04723 exploration
+This is a project for https://arxiv.org/abs/2306.04723 exploration.
 
 # Paper
 
@@ -10,6 +10,11 @@ Some source codes and data used in paper located in `main_paper_data` directory.
 # Application
 
 For simplicity of experimentation, there is a server app and browser extension.
+
+## Magnitude Idea
+
+In `magnitude.md` there is an extract from presentation about using magnitude function
+for computing sets dimension.
 
 ## Application Structure
 
