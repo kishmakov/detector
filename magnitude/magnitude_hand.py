@@ -6,6 +6,18 @@ import torch
 from transformers import AutoTokenizer, AutoModel
 
 
+MODEL_LINE_STYLES = {
+    "roberta-base": "-",
+    "roberta-large": "--",
+    "bert-base-uncased": "-.",
+    "bert-large-uncased": ":",
+    "distilroberta-base": (0, (5, 1)),
+    "distilbert-base-uncased": (0, (3, 1, 1, 1)),
+    "microsoft/deberta-v3-base": (0, (7, 2)),
+    "microsoft/deberta-v3-large": (0, (3, 2, 1, 2)),
+}
+
+
 def magnitude_at_t(X: np.ndarray, t: float, reg: float = 1e-6) -> float:
     """
     Compute the magnitude |tA| for a set of embeddings X at scale t.
@@ -51,27 +63,49 @@ def text_to_embeddings(text: str, tokenizer, model, max_length: int = 512) -> np
     return np.concatenate(chunks, axis=0)
 
 
-def plot_magnitude(model, tokenizer, text: str, output_path: Path) -> None:
+def compute_magnitude_curve(model, tokenizer, text: str) -> tuple[np.ndarray, np.ndarray]:
     X = text_to_embeddings(text, tokenizer, model)
 
     # log-spaced t values
     t_values = np.logspace(-3, 2, 40)  # 0.001 → 100
     magnitudes = np.array([magnitude_at_t(X, t) for t in t_values])
 
-    finite = np.isfinite(magnitudes)
-    positive = finite & (magnitudes > 0)
+    return t_values, magnitudes
 
+
+def plot_magnitude_comparison(
+    curves_by_model: dict[str, tuple[np.ndarray, np.ndarray]],
+    output_path: Path,
+) -> None:
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
-    axes[0].loglog(t_values[positive], magnitudes[positive])
+    for model_name, (t_values, magnitudes) in curves_by_model.items():
+        finite = np.isfinite(magnitudes)
+        positive = finite & (magnitudes > 0)
+        line_style = MODEL_LINE_STYLES[model_name]
+
+        axes[0].loglog(
+            t_values[positive],
+            magnitudes[positive],
+            linestyle=line_style,
+            label=model_name,
+        )
+        axes[1].semilogx(
+            t_values[finite],
+            magnitudes[finite],
+            linestyle=line_style,
+            label=model_name,
+        )
+
     axes[0].set_xlabel("log t (scale)")
     axes[0].set_ylabel("log |tA| (magnitude)")
     axes[0].set_title("Magnitude function (log-log)")
+    axes[0].legend()
 
-    axes[1].semilogx(t_values[finite], magnitudes[finite])
     axes[1].set_xlabel("log t (scale)")
     axes[1].set_ylabel("linear |tA| (magnitude)")
     axes[1].set_title("Magnitude function (log-linear)")
+    axes[1].legend()
 
     fig.tight_layout()
     plt.savefig(output_path, dpi=200, bbox_inches='tight')
@@ -80,7 +114,7 @@ def plot_magnitude(model, tokenizer, text: str, output_path: Path) -> None:
 
 
 if __name__ == "__main__":
-    for model_name in [
+    model_names = [
         "roberta-base",
         "roberta-large",
         "bert-base-uncased",
@@ -89,14 +123,23 @@ if __name__ == "__main__":
         "distilbert-base-uncased",
         "microsoft/deberta-v3-base",
         "microsoft/deberta-v3-large",
-    ]:
+    ]
+    example_paths = sorted(Path("examples").glob("*.txt"))
+    curves_by_file = {path: {} for path in example_paths}
+
+    for model_name in model_names:
         print("Processing", model_name, "...")
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         model = AutoModel.from_pretrained(model_name)
         model.eval()
 
-        for path in Path('examples').glob('*.txt'):
+        for path in example_paths:
             print("Processing", path, "...")
-            text = path.read_text(encoding='utf-8')
-            output_path = path.with_name(path.stem + f'_{model_name.replace("/", "_")}.png')
-            plot_magnitude(model, tokenizer, text, output_path)
+            text = path.read_text(encoding="utf-8")
+            curves_by_file[path][model_name] = compute_magnitude_curve(model, tokenizer, text)
+
+    for path, curves_by_model in curves_by_file.items():
+        plot_magnitude_comparison(
+            curves_by_model,
+            path.with_name(path.stem + ".png"),
+        )
