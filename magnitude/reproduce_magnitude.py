@@ -30,14 +30,11 @@ from tqdm import tqdm
 
 sys.path.insert(0, os.path.dirname(__file__))
 from magnitude import MagnitudeEstimator
+from text_processing import preprocess_text
 
 MIN_TOKENS = 40   # skip texts with fewer usable tokens
 FEAT_NAMES = ['slope_fine', 'slope_medium', 'slope_coarse',
               'slope_overall', 'curvature', 'log_mag_mid']
-
-
-def preprocess_text(text: str) -> str:
-    return text.replace('\n', ' ').replace('  ', ' ')
 
 
 def process_texts(texts, tokenizer, model, desc='') -> tuple[np.ndarray, np.ndarray]:
