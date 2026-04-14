@@ -30,7 +30,7 @@ from tqdm import tqdm
 
 sys.path.insert(0, os.path.dirname(__file__))
 from magnitude import MagnitudeEstimator
-from text_processing import preprocess_text
+from src.text_utils import preprocess_text
 
 MIN_TOKENS = 40   # skip texts with fewer usable tokens
 FEAT_NAMES = ['slope_fine', 'slope_medium', 'slope_coarse',

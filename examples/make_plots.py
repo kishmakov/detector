@@ -1,13 +1,13 @@
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.spatial.distance import cdist
 from pathlib import Path
 import torch
 from transformers import AutoTokenizer, AutoModel
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from magnitude.text_processing import preprocess_text
+from src.magnitude import magnitude_at_t
+from src.text_utils import preprocess_text
 
 
 FIRST_SEGMENT_WORDS = 250
@@ -36,26 +36,6 @@ TEXT_INFO = {
 }
 
 
-def magnitude_at_t(X: np.ndarray, t: float, reg: float = 1e-6) -> float:
-    """
-    Compute the magnitude |tA| for a set of embeddings X at scale t.
-
-    Parameters
-    ----------
-    X   : (n, d) embedding matrix
-    t   : scale parameter
-    reg : small regularization for stability
-
-    """
-    D = cdist(X, X, metric='euclidean')  # Pairwise distances
-    Z = np.exp(-t * D)
-    Z += reg * np.eye(Z.shape[0])
-
-    # Solve Z w = 1
-    w = np.linalg.solve(Z, np.ones(Z.shape[0]))
-    return float(w.sum())
-
-
 def text_to_embeddings(text: str, tokenizer, model, max_length: int = 512) -> np.ndarray:
     assert text, "Text is empty"
 
@@ -79,6 +59,26 @@ def text_to_embeddings(text: str, tokenizer, model, max_length: int = 512) -> np
 
     assert len(chunks) > 0, "No embeddings generated"
     return np.concatenate(chunks, axis=0)
+
+
+# def text_to_static_embeddings(text: str, tokenizer, model) -> np.ndarray:
+#     assert text, "Text is empty"
+
+#     # 1. Tokenize the whole thing at once
+#     # No need for max_length or special tokens for static lookups
+#     token_ids = tokenizer.encode(text, add_special_tokens=False, return_tensors="pt")
+
+#     # 2. Direct lookup in the embedding matrix
+#     # We move to the model's device in case you're on GPU
+#     token_ids = token_ids.to(model.device)
+
+#     with torch.no_grad():
+#         # Access the underlying weight matrix
+#         static_embeddings = model.embeddings.word_embeddings(token_ids)
+
+#     # 3. Clean up shape: [1, sequence_length, hidden_size] -> [sequence_length, hidden_size]
+#     result = static_embeddings.squeeze(0).cpu().numpy()
+#     return result
 
 
 def compute_magnitude_curve(model, tokenizer, text: str) -> tuple[np.ndarray, np.ndarray]:
