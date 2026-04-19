@@ -1,8 +1,8 @@
 from pathlib import Path
 from torch.utils.data import Dataset
 
-from json_iterator import json_iterator
-from model import Model, model_iterator
+from src.json_iterator import json_iterator
+from src.model import Model, model_iterator
 
 
 class EmbeddingsDataset(Dataset):
