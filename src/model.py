@@ -25,6 +25,8 @@ class Model:
         self._model.eval()
 
     def text_to_embeddings(self, text: str, max_length: int = 512) -> np.ndarray:
+        assert text, "Text is empty"
+
         token_ids = self._tokenizer.encode(text, add_special_tokens=False)[:max_length]
         token_ids = token_ids
 
@@ -34,7 +36,9 @@ class Model:
             ids = torch.tensor([[self._tokenizer.cls_token_id] + chunk + [self._tokenizer.sep_token_id]])
             with torch.no_grad():
                 out = self._model(input_ids=ids, attention_mask=torch.ones_like(ids))
+            # Drop CLS and SEP embeddings
             chunks.append(out[0][0, 1:-1].cpu().numpy())
+        assert len(chunks) > 0, "No embeddings generated"
         return np.concatenate(chunks, axis=0)
 
 

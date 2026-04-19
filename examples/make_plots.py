@@ -2,14 +2,13 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
-import torch
-from transformers import AutoTokenizer, AutoModel
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.magnitude import magnitude_at_t
 from src.text_utils import preprocess_text
-from src.model import model_iterator
+from src.model import model_iterator, MODEL_INFO
 
+MODEL_INFO = dict(MODEL_INFO)
 
 FIRST_SEGMENT_WORDS = 250
 
@@ -24,31 +23,6 @@ TEXT_INFO = {
     "07_repetition_512":  {"style": (0, (5, 5))},
     "08_defoe_339":       {"style": (0, (3, 5, 1, 5))},
 }
-
-
-def text_to_embeddings(text: str, tokenizer, model, max_length: int = 512) -> np.ndarray:
-    assert text, "Text is empty"
-
-    # Tokenize without special tokens to avoid the full-sequence length warning
-    token_ids = tokenizer.encode(text, add_special_tokens=False)
-
-    chunk_size = max_length - 2  # reserve 2 slots for CLS + SEP per chunk
-    chunks = []
-
-    for i in range(0, len(token_ids), chunk_size):
-        chunk = token_ids[i:i+chunk_size]
-        ids = torch.tensor([[tokenizer.cls_token_id] + chunk + [tokenizer.sep_token_id]])
-        mask = torch.ones_like(ids)
-
-        with torch.no_grad():
-            out = model(input_ids=ids, attention_mask=mask)
-
-        # Drop CLS and SEP embeddings
-        emb = out[0][0, 1:-1].cpu().numpy()
-        chunks.append(emb)
-
-    assert len(chunks) > 0, "No embeddings generated"
-    return np.concatenate(chunks, axis=0)
 
 
 # def text_to_static_embeddings(text: str, tokenizer, model) -> np.ndarray:
@@ -176,17 +150,17 @@ if __name__ == "__main__":
     }
 
     curves_by_stem = {stem: {} for stem in TEXT_INFO}
-    segment_curves_by_model = {model_name: {} for model_name in MODEL_INFO}
+    segment_curves_by_model = {}
 
     for model in model_iterator()   :
         print("Processing", model.name, "...")
 
         for stem, (full_text, segment_text) in preprocessed.items():
             print("Processing", stem, "...")
-            curves_by_stem[stem][model.name] = compute_magnitude_curve(model, full_text)
+            curves_by_stem.setdefault(stem, {})[model.name] = compute_magnitude_curve(model, full_text)
 
             if segment_text:
-                segment_curves_by_model[model.name][stem] = compute_magnitude_curve(
+                segment_curves_by_model.setdefault(model.name, {})[stem] = compute_magnitude_curve(
                     model,
                     segment_text,
                 )
