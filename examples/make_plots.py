@@ -8,7 +8,7 @@ from transformers import AutoTokenizer, AutoModel
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.magnitude import magnitude_at_t
 from src.text_utils import preprocess_text
-from src.model_info import MODEL_INFO
+from src.model import model_iterator
 
 
 FIRST_SEGMENT_WORDS = 250
@@ -71,8 +71,8 @@ def text_to_embeddings(text: str, tokenizer, model, max_length: int = 512) -> np
 #     return result
 
 
-def compute_magnitude_curve(model, tokenizer, text: str) -> tuple[np.ndarray, np.ndarray]:
-    X = text_to_embeddings(text, tokenizer, model)
+def compute_magnitude_curve(model, text: str) -> tuple[np.ndarray, np.ndarray]:
+    X = model.text_to_embeddings(text)
 
     # log-spaced t values
     t_values = np.logspace(-3, 2, 40)  # 0.001 → 100
@@ -178,20 +178,16 @@ if __name__ == "__main__":
     curves_by_stem = {stem: {} for stem in TEXT_INFO}
     segment_curves_by_model = {model_name: {} for model_name in MODEL_INFO}
 
-    for model_name in MODEL_INFO:
-        print("Processing", model_name, "...")
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModel.from_pretrained(model_name)
-        model.eval()
+    for model in model_iterator()   :
+        print("Processing", model.name, "...")
 
         for stem, (full_text, segment_text) in preprocessed.items():
             print("Processing", stem, "...")
-            curves_by_stem[stem][model_name] = compute_magnitude_curve(model, tokenizer, full_text)
+            curves_by_stem[stem][model.name] = compute_magnitude_curve(model, full_text)
 
             if segment_text:
-                segment_curves_by_model[model_name][stem] = compute_magnitude_curve(
+                segment_curves_by_model[model.name][stem] = compute_magnitude_curve(
                     model,
-                    tokenizer,
                     segment_text,
                 )
 
