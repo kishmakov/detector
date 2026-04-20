@@ -22,105 +22,104 @@ def magnitude_at_t(X: np.ndarray, t: float, reg: float = 1e-6) -> float:
     return float(w.sum())
 
 
-def _magnitude_features_single(
-    X: np.ndarray,
-    n_scales: int,
-    t_min_norm: float,
-    t_max_norm: float,
-    max_points: int,
-    reg: float,
-    rng: np.random.Generator,
-) -> np.ndarray | None:
-    """
-    Subsample X, compute the magnitude function, return the log-log slope.
-
-    The scale grid is normalised by the median pairwise distance so that
-    t_min_norm=0.02 and t_max_norm=5.0 cover ~2.5 decades centred on the
-    natural scale of the point cloud regardless of embedding magnitude.
-    """
-
-    n = X.shape[0]
-    if n > max_points:
-        X = X[rng.choice(n, max_points, replace=False)]
-
-    D = cdist(X, X, metric='euclidean')
-    nz = D[D > 0]
-    if nz.size == 0:
-        return None
-    median_dist = float(np.median(nz))
-    if median_dist == 0:
-        return None
-
-    t_values = np.logspace(
-        np.log10(t_min_norm / median_dist),
-        np.log10(t_max_norm / median_dist),
-        n_scales,
-    )
-
-    mags = []
-    for t in t_values:
-        try:
-            m = magnitude_at_t(X, t, reg)
-            mags.append(m if 0.5 <= m <= len(X) * 2 else np.nan)
-        except np.linalg.LinAlgError:
-            mags.append(np.nan)
-    magnitudes = np.array(mags)
-
-    valid = ~np.isnan(magnitudes) & (magnitudes > 0)
-    if valid.sum() < 6:
-        return None
-
-    log_t = np.log(t_values[valid])
-    log_m = np.log(magnitudes[valid])
-    n_valid = len(log_t)
-    third = n_valid // 3
-
-    def slope(lt, lm):
-        return float(np.polyfit(lt, lm, 1)[0]) if len(lt) >= 2 else np.nan
-
-    slope_overall, _ = np.polyfit(log_t, log_m, 1)
-    curvature = float(np.polyfit(log_t, log_m, 2)[0]) if n_valid >= 3 else np.nan
-
-    return np.array([
-        slope(log_t[:third],        log_m[:third]),
-        slope(log_t[third:2*third], log_m[third:2*third]),
-        slope(log_t[2*third:],      log_m[2*third:]),
-        float(slope_overall),
-        curvature,
-        float(log_m[n_valid // 2]),
-    ], dtype=float)
-
-
 class MagnitudeEstimator:
     def __init__(
         self,
+        seed: int = 0,
         n_scales: int = 25,
         t_min_norm: float = 0.02,
         t_max_norm: float = 8.0,
         max_points: int = 150,
         n_reruns: int = 3,
-        reg: float = 1e-5,
     ):
         """
         Estimates the geometric "magnitude dimension" of a token-embedding cloud.
 
         Parameters
         ----------
+        seed        : random seed for subsampling
         n_scales    : number of scale values t on a log grid
         t_min_norm  : smallest t (as a fraction of median pairwise distance)
         t_max_norm  : largest  t (as a fraction of median pairwise distance)
         max_points  : subsample size (keeps computation tractable for long texts)
         n_reruns    : number of independent subsampling reruns; result is the mean
-        reg         : regularisation strength for the magnitude matrix
         """
+        self.rng = np.random.default_rng(seed)
         self.n_scales = n_scales
         self.t_min_norm = t_min_norm
         self.t_max_norm = t_max_norm
         self.max_points = max_points
         self.n_reruns = n_reruns
-        self.reg = reg
 
-    def magnitude_features(self, X: np.ndarray, seed: int = 0) -> np.ndarray:
+    def _magnitude_features_single(
+        self,
+        X: np.ndarray,
+        n_scales: int,
+        t_min_norm: float,
+        t_max_norm: float,
+        max_points: int,
+    ) -> np.ndarray | None:
+        """
+        Subsample X, compute the magnitude function, return the log-log slope.
+
+        The scale grid is normalised by the median pairwise distance so that
+        t_min_norm=0.02 and t_max_norm=5.0 cover ~2.5 decades centred on the
+        natural scale of the point cloud regardless of embedding magnitude.
+        """
+
+        n = X.shape[0]
+        if n > max_points:
+            X = X[self.rng.choice(n, max_points, replace=False)]
+
+        D = cdist(X, X, metric='euclidean')
+        nz = D[D > 0]
+        if nz.size == 0:
+            return None
+        median_dist = float(np.median(nz))
+        if median_dist == 0:
+            return None
+
+        t_values = np.logspace(
+            np.log10(t_min_norm / median_dist),
+            np.log10(t_max_norm / median_dist),
+            n_scales,
+        )
+
+        mags = []
+        for t in t_values:
+            m = magnitude_at_t(X, t)
+            assert 0.5 <= m <= len(X) * 2, "Unexpected magnitude value"
+            mags.append(m)
+
+        magnitudes = np.array(mags)
+
+        valid = ~np.isnan(magnitudes) & (magnitudes > 0)
+        if valid.sum() < 6:
+            return None
+
+        log_t = np.log(t_values[valid])
+        log_m = np.log(magnitudes[valid])
+        n_valid = len(log_t)
+        third = n_valid // 3
+
+        def slope(lt, lm):
+            assert len(lt) >= 2, "Need at least 2 points to compute slope"
+            return float(np.polyfit(lt, lm, 1)[0])
+
+        slope_overall, _ = np.polyfit(log_t, log_m, 1)
+        curvature = float(np.polyfit(log_t, log_m, 2)[0]) if n_valid >= 3 else np.nan
+
+        return np.array([
+            slope(log_t[:third],        log_m[:third]),
+            slope(log_t[third:2*third], log_m[third:2*third]),
+            slope(log_t[2*third:],      log_m[2*third:]),
+            float(slope_overall),
+            curvature,
+            float(log_m[n_valid // 2]),
+        ], dtype=float)
+
+
+    def magnitude_features(self, X: np.ndarray) -> np.ndarray:
         """
         Extract a multi-scale feature vector from the magnitude function.
 
@@ -143,11 +142,10 @@ class MagnitudeEstimator:
 
         Results are averaged over n_reruns independent subsampling runs.
         """
-        rng = np.random.default_rng(seed)
         runs = [
-            _magnitude_features_single(
+            self._magnitude_features_single(
                 X, self.n_scales, self.t_min_norm, self.t_max_norm,
-                self.max_points, self.reg, rng,
+                self.max_points
             )
             for _ in range(self.n_reruns)
         ]

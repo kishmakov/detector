@@ -15,8 +15,12 @@ print(f"Model: {model.name}")
 
 dataset = EmbeddingsDataset(model, DATA_DIR)
 
+print(f"Number of samples: {len(dataset)}")
+
 X = np.array([dataset[i][0].mean(axis=0) for i in range(len(dataset))])
 y = np.array([dataset[i][1] for i in range(len(dataset))])
+
+print("Dataset prepared. Running logistic regression...")
 
 clf = LogisticRegression(max_iter=1000)
 

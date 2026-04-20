@@ -17,6 +17,8 @@ print(f"Model: {model.name}")
 dataset = EmbeddingsDataset(model, DATA_DIR)
 est = MagnitudeEstimator()
 
+print(f"Number of samples: {len(dataset)}")
+
 rows, labels = [], []
 for i in range(len(dataset)):
     emb, label = dataset[i]
@@ -24,6 +26,8 @@ for i in range(len(dataset)):
     assert features is not None, "Magnitude features should not be empty"
     rows.append(features)
     labels.append(label)
+
+print("Dataset prepared. Running logistic regression...")
 
 clf = LogisticRegression(max_iter=1000)
 
