@@ -28,8 +28,8 @@ from sklearn.preprocessing import StandardScaler
 from transformers import AutoModel, AutoTokenizer
 from tqdm import tqdm
 
-sys.path.insert(0, os.path.dirname(__file__))
-from magnitude import MagnitudeEstimator
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from src.magnitude import MagnitudeEstimator
 from src.text_utils import preprocess_text
 
 MIN_TOKENS = 40   # skip texts with fewer usable tokens

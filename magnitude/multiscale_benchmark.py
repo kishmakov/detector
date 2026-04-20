@@ -31,8 +31,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-sys.path.insert(0, os.path.dirname(__file__))
-from magnitude import MagnitudeEstimator
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from src.magnitude import MagnitudeEstimator
 
 
 # ---------------------------------------------------------------------------

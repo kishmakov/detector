@@ -17,8 +17,8 @@ import numpy as np
 import torch
 from transformers import AutoModel, AutoTokenizer
 
-sys.path.insert(0, os.path.dirname(__file__))
-from magnitude import MagnitudeEstimator
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from src.magnitude import MagnitudeEstimator
 
 # ---------------------------------------------------------------------------
 # Sample texts
