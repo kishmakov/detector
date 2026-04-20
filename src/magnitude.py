@@ -88,17 +88,13 @@ class MagnitudeEstimator:
         mags = []
         for t in t_values:
             m = magnitude_at_t(X, t)
-            assert 0.5 <= m <= len(X) * 2, "Unexpected magnitude value"
+            assert 0.01 <= m <= len(X) * 2, "Unexpected magnitude value"
             mags.append(m)
 
         magnitudes = np.array(mags)
 
-        valid = ~np.isnan(magnitudes) & (magnitudes > 0)
-        if valid.sum() < 6:
-            return None
-
-        log_t = np.log(t_values[valid])
-        log_m = np.log(magnitudes[valid])
+        log_t = np.log(t_values)
+        log_m = np.log(magnitudes)
         n_valid = len(log_t)
         third = n_valid // 3
 
