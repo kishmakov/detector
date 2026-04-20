@@ -131,7 +131,7 @@ class MagnitudeEstimator:
             3  slope_overall — log-log slope across the full range (= fit_transform)
             4  curvature     — 2nd-order coefficient of a quadratic log-log fit
                                (positive ⟹ concave up, i.e. growing faster at large t)
-            5  log_mag_mid   — log(|tA|) at the median scale (proxy for effective size)
+            5  log_mag_mid   — log(|tA|) at the median scale
 
         Returns np.nan for all features if the magnitude function cannot be
         computed reliably (too few valid scales).
