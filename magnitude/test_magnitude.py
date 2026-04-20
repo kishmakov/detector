@@ -3,6 +3,7 @@ import numpy as np
 from pathlib import Path
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_validate
+from tqdm import tqdm
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.magnitude import MagnitudeEstimator
@@ -20,7 +21,7 @@ est = MagnitudeEstimator()
 print(f"Number of samples: {len(dataset)}")
 
 rows, labels = [], []
-for i in range(len(dataset)):
+for i in tqdm(range(len(dataset))):
     emb, label = dataset[i]
     features = est.magnitude_features(emb)
     assert features is not None, "Magnitude features should not be empty"
