@@ -75,15 +75,17 @@ def main():
             completion_text = _query_openai(prefix_text)
             word_count = len(completion_text.split())
 
+            print(f"Generated completion for prefix_id={prefix_id} prefix_text={prefix_text[:60]} ...: {completion_text[:60]}")
+
             cursor.execute(
                 "INSERT INTO completions (model, text, word_count, prefix_id) VALUES (?, ?, ?, ?)",
                 (model_name, completion_text, word_count, prefix_id)
             )
 
+            conn.commit()
         except Exception as e:
             print(f"Generation error prefix_id={prefix_id} prefix_text={prefix_text[:60]} ...: {e}")
 
-    conn.commit()
     conn.close()
 
 if __name__ == "__main__":
