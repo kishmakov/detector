@@ -8,7 +8,7 @@ CREATE TABLE prefixes (
 
 CREATE TABLE completions (
     id         INTEGER PRIMARY KEY,
-    model      TEXT NOT NULL, -- 'human' or id of model like 'gpt2'
+    model      TEXT NOT NULL, -- 'human' or id of the model like 'gpt2'
     text       TEXT NOT NULL,
     word_count INTEGER,
     created_at TEXT DEFAULT (datetime('now')),
