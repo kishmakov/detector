@@ -38,6 +38,17 @@ def _insert_completion(conn: sqlite3.Connection, model: str, text: str, prefix_i
     """Insert a completion into the database."""
     text = text.strip()
     word_count = len(text.split())
+
+    # Avoid duplicating human completions for the same prefix
+    if model == "human":
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT id FROM completions WHERE model = ? AND prefix_id = ?",
+            (model, prefix_id)
+        )
+        if cursor.fetchone():
+            return  # Skip if already exists
+
     conn.execute(
         "INSERT INTO completions (model, text, word_count, prefix_id) VALUES (?, ?, ?, ?)",
         (model, text, word_count, prefix_id)
