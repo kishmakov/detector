@@ -1,3 +1,9 @@
-data
-.venv
+# Data
+*.json_pp
+*.db
+
+# Caches
+*.npy
 __pycache__
+
+.venv
