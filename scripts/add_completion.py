@@ -8,8 +8,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DB_PATH = ROOT / "data" / "completions.db"
 
-model_name = "gpt-5.4-mini"
-open_router_model_id = "gpt-5"
+model_name = "gemini-3.1-pro"
+open_router_model_id = "google/gemini-3.1-pro-preview"
 openai_model_id = "gpt-5.4-mini"
 
 import sys
@@ -26,9 +26,13 @@ def _query_open_router(api_key: str, prefix_text: str) -> str:
                     "content": f"Continue this text: {prefix_text}"
                 }
             ],
-            max_tokens=300,  # To match paper's ~300 tokens
-            temperature=1.0
-    )
+            max_tokens=2300,  # To match paper's ~300 tokens
+            reasoning= {
+                "effort": "minimal",
+                "exclude": True,
+                "max_tokens": 2000,
+            }
+        )
 
     return response.choices[0].message.content.strip()
 
@@ -71,8 +75,8 @@ def main():
 
         # generate new completion
         try:
-            # completion_text = _query_open_router(api_key, prefix_text)
-            completion_text = _query_openai(prefix_text)
+            completion_text = _query_open_router(api_key, prefix_text)
+            # completion_text = _query_openai(prefix_text)
             word_count = len(completion_text.split())
 
             print(f"Generated completion for prefix_id={prefix_id} prefix_text={prefix_text[:60]} ...: {completion_text[:60]}")
