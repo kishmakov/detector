@@ -4,19 +4,19 @@
 
 #### train=reddit, test=wiki
 
-| Completions |   all |  gpt3 |
-|-------------|-------|-------|
-|     ROC-AUC | 0.559 | 0.706 |
-|    Accuracy | 0.702 | 0.571 |
-|    F1-Score | 0.116 | 0.377 |
+| Completions |   all |  gpt3 | gpt-5.4-mini | gemini-3.1-pro |
+|-------------|-------|-------|--------------|----------------|
+|     ROC-AUC | 0.559 | 0.706 |        0.336 |          0.957 |
+|    Accuracy | 0.702 | 0.571 |        0.377 |          0.598 |
+|    F1-Score | 0.116 | 0.377 |        0.371 |          0.332 |
 
 #### train=wiki, test=reddit, completions=all
 
-| Completions |   all |  gpt3 |
-|-------------|-------|-------|
-|     ROC-AUC | 0.497 | 0.734 |
-|    Accuracy | 0.748 | 0.571 |
-|    F1-Score | 0.039 | 0.275 |
+| Completions |   all |  gpt3 | gpt-5.4-mini | gemini-3.1-pro |
+|-------------|-------|-------|--------------|----------------|
+|     ROC-AUC | 0.497 | 0.734 |        0.289 |          0.935 |
+|    Accuracy | 0.748 | 0.571 |        0.398 |          0.874 |
+|    F1-Score | 0.039 | 0.275 |        0.291 |          0.872 |
 
 
 <!--

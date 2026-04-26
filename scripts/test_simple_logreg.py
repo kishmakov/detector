@@ -4,42 +4,26 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.logistic_regression import make_dataset, collect_features, train_eval
 
-# Experiment #1: train=reddit, test=wiki, completions=all
+feature_fn = lambda emb: emb.mean(axis=0)
 
-# dataset_train = make_dataset(source="reddit")
-# dataset_test = make_dataset(source="wiki")
+def run_experiment(train, test, model=None):
+    suffix = f"_{model}" if model else ""
+    ds_train = make_dataset(source=train, model=model)
+    ds_test  = make_dataset(source=test, model=model)
+    X_train, y_train = collect_features(ds_train, feature_fn, f"{train}_mean{suffix}")
+    X_test,  y_test  = collect_features(ds_test,  feature_fn, f"{test}_mean{suffix}")
+    train_eval(X_train, y_train, X_test, y_test)
 
-# X_train, y_train = collect_features(dataset_train, lambda emb: emb.mean(axis=0), "reddit_mean")
-# X_test, y_test = collect_features(dataset_test, lambda emb: emb.mean(axis=0), "wiki_mean")
+experiments = [
+    ("reddit", "wiki",   None), #1: train=reddit, test=wiki, completions=all
+    ("wiki",   "reddit", None), #2: train=wiki, test=reddit, completions=all
+    ("reddit", "wiki",   "gpt3"), #3: train=reddit, test=wiki, completions=gpt3
+    ("wiki",   "reddit", "gpt3"), #4: train=wiki, test=reddit, completions=gpt3
+    ("reddit", "wiki",   "gpt-5.4-mini"), #4: train=reddit, test=wiki, completions=gpt-5.4-mini
+    ("wiki",   "reddit", "gpt-5.4-mini"), #5: train=wiki, test=reddit, completions=gpt-5.4-mini
+    ("reddit", "wiki",   "gemini-3.1-pro"), #6: train=reddit, test=wiki, completions=gemini-3.1-pro
+    ("wiki",   "reddit", "gemini-3.1-pro"), #7: train=wiki, test=reddit, completions=gemini-3.1-pro
+]
 
-# train_eval(X_train, y_train, X_test, y_test)
-
-# Experiment #2: train=wiki, test=reddit, completions=all
-
-# dataset_train = make_dataset(source="wiki")
-# dataset_test = make_dataset(source="reddit")
-
-# X_train, y_train = collect_features(dataset_train, lambda emb: emb.mean(axis=0), "wiki_mean")
-# X_test, y_test = collect_features(dataset_test, lambda emb: emb.mean(axis=0), "reddit_mean")
-
-# train_eval(X_train, y_train, X_test, y_test)
-
-# Experiment #3: train=reddit, test=wiki, completions=gpt3
-
-# dataset_train = make_dataset(source="reddit", model="gpt3")
-# dataset_test = make_dataset(source="wiki", model="gpt3")
-
-# X_train, y_train = collect_features(dataset_train, lambda emb: emb.mean(axis=0), "reddit_mean_gpt3")
-# X_test, y_test = collect_features(dataset_test, lambda emb: emb.mean(axis=0), "wiki_mean_gpt3")
-
-# train_eval(X_train, y_train, X_test, y_test)
-
-# Experiment #4: train=wiki, test=reddit, completions=gpt3
-
-dataset_train = make_dataset(source="wiki", model="gpt3")
-dataset_test = make_dataset(source="reddit", model="gpt3")
-
-X_train, y_train = collect_features(dataset_train, lambda emb: emb.mean(axis=0), "wiki_mean_gpt3")
-X_test, y_test = collect_features(dataset_test, lambda emb: emb.mean(axis=0), "reddit_mean_gpt3")
-
-train_eval(X_train, y_train, X_test, y_test)
+for train, test, model in experiments:
+    run_experiment(train, test, model)
