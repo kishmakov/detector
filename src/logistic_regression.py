@@ -7,19 +7,25 @@ from tqdm import tqdm
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.embeddings_dataset import EmbeddingsDataset
-from src.model import model_iterator
+from src.embeddings_provider import embeddings_provider_iterator
 
 DATA_DIR = Path(__file__).parent.parent / "main_paper_data" / "data"
 DATA_DIR_OUT = Path(__file__).parent.parent / "data"
 
 
 def make_dataset() -> EmbeddingsDataset:
-    model = next(iter(model_iterator()))
+    model = next(iter(embeddings_provider_iterator()))
     print(f"Model: {model.name}")
     return EmbeddingsDataset(model, DATA_DIR)
 
 
 def collect_features(dataset, feature_fn, cache_name: str) -> tuple[np.ndarray, np.ndarray]:
+    """Produce (X, y) tuples for logistic regression to train on.
+    Args:
+        dataset: The dataset to collect features from.
+        feature_fn: A function that takes an embedding and returns a feature vector.
+        cache_name: A name for the cache files.
+    """
     rows_path = DATA_DIR_OUT / f"{cache_name}_rows.npy"
     labels_path = DATA_DIR_OUT / f"{cache_name}_labels.npy"
 

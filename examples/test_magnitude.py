@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.logistic_regression_test import make_dataset, collect_features, run
+from src.logistic_regression import make_dataset, collect_features, run
 from src.magnitude import MagnitudeEstimator
 
 dataset = make_dataset()

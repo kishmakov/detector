@@ -1,6 +1,7 @@
 # Data
 *.json_pp
 *.db
+tmp
 
 # Caches
 *.npy

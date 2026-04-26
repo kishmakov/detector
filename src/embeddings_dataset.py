@@ -2,11 +2,11 @@ from pathlib import Path
 from torch.utils.data import Dataset
 
 from src.json_iterator import json_iterator
-from src.model import Model, model_iterator
+from src.embeddings_provider import EmbeddingsProvider, embeddings_provider_iterator
 
 
 class EmbeddingsDataset(Dataset):
-    def __init__(self, model: Model, data_dir: Path):
+    def __init__(self, model: EmbeddingsProvider, data_dir: Path):
         self._model = model
         self._texts = []  # (text, label)
 
@@ -25,5 +25,5 @@ class EmbeddingsDataset(Dataset):
 
 
 def dataset_iterator(data_dir: Path):
-    for model in model_iterator():
+    for model in embeddings_provider_iterator():
         yield model.short_id, EmbeddingsDataset(model, data_dir)

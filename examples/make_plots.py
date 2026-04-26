@@ -6,7 +6,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.magnitude import magnitude_at_t
 from src.text_utils import preprocess_text
-from src.model import model_iterator, MODEL_INFO
+from src.embeddings_provider import embeddings_provider_iterator, MODEL_INFO
 
 MODEL_INFO = dict(MODEL_INFO)
 
@@ -152,7 +152,7 @@ if __name__ == "__main__":
     curves_by_stem = {stem: {} for stem in TEXT_INFO}
     segment_curves_by_model = {}
 
-    for model in model_iterator()   :
+    for model in embeddings_provider_iterator()   :
         print("Processing", model.name, "...")
 
         for stem, (full_text, segment_text) in preprocessed.items():

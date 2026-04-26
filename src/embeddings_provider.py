@@ -15,7 +15,7 @@ MODEL_INFO = [
 
 CHUNK_SIZE = 510
 
-class Model:
+class EmbeddingsProvider:
     def __init__(self, name: str, info: dict):
         self.name = name
         self.short_id = info["short_id"]
@@ -42,6 +42,6 @@ class Model:
         return np.concatenate(chunks, axis=0)
 
 
-def model_iterator():
+def embeddings_provider_iterator():
     for name, info in MODEL_INFO:
-        yield Model(name, info)
+        yield EmbeddingsProvider(name, info)
