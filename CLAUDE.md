@@ -17,11 +17,10 @@ Replication and exploration of https://arxiv.org/abs/2306.04723 — AI-text dete
 | File | Purpose |
 |---|---|
 | `embeddings_provider.py` | Load HuggingFace models; compute token embeddings |
-| `embeddings_dataset.py` | PyTorch Dataset wrapping DB / JSON iterators |
-| `db_iterator.py` | Iterate rows from `completions.db` |
-| `json_iterator.py` | Iterate completions from JSON files |
+| `embeddings_dataset.py` | PyTorch Dataset wrapping DB iterator |
+| `db_iterator.py` | Iterate over completions gathered from `completions.db` |
 | `magnitude.py` | Magnitude function for intrinsic dimension estimation |
-| `logistic_regression.py` | Train/eval logistic regression classifier |
+| `logistic_regression.py` | Tools for train/eval logistic regression classifier |
 | `text_utils.py` | Text preprocessing helpers |
 
 # Examples (`examples/`)

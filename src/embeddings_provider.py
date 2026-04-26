@@ -27,8 +27,7 @@ class EmbeddingsProvider:
     def text_to_embeddings(self, text: str, max_length: int = 512) -> np.ndarray:
         assert text, "Text is empty"
 
-        token_ids = self._tokenizer.encode(text, add_special_tokens=False)[:max_length]
-        token_ids = token_ids
+        token_ids = list(self._tokenizer.encode(text, add_special_tokens=False))[:max_length]
 
         chunks = []
         for i in range(0, len(token_ids), CHUNK_SIZE):
@@ -45,3 +44,11 @@ class EmbeddingsProvider:
 def embeddings_provider_iterator():
     for name, info in MODEL_INFO:
         yield EmbeddingsProvider(name, info)
+
+
+def embeddings_provider_by_name(*, name: str = "bert-base-uncased") -> EmbeddingsProvider:
+    for model_name, info in MODEL_INFO:
+        if model_name == name:
+            return EmbeddingsProvider(name, info)
+    raise ValueError(f"EmbeddingsProvider with name '{name}' not found")
+

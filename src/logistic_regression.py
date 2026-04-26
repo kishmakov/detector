@@ -2,21 +2,24 @@ import sys
 import numpy as np
 from pathlib import Path
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_auc_score, accuracy_score, f1_score
 from sklearn.model_selection import cross_validate
 from tqdm import tqdm
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 from src.embeddings_dataset import EmbeddingsDataset
-from src.embeddings_provider import embeddings_provider_iterator
-
-DATA_DIR = Path(__file__).parent.parent / "main_paper_data" / "data"
-DATA_DIR_OUT = Path(__file__).parent.parent / "data"
+from src.embeddings_provider import embeddings_provider_by_name
 
 
-def make_dataset() -> EmbeddingsDataset:
-    model = next(iter(embeddings_provider_iterator()))
-    print(f"Model: {model.name}")
-    return EmbeddingsDataset(model, DATA_DIR)
+DB_PATH = ROOT / "data" / "completions.db"
+TEMP_DIR = ROOT / "tmp"
+
+
+def make_dataset(*, name: str = "bert-base-uncased", source=None, model=None) -> EmbeddingsDataset:
+    provider = embeddings_provider_by_name(name=name)
+    print(f"Embedder: {provider.name}")
+    return EmbeddingsDataset(provider, DB_PATH, source=source, model=model)
 
 
 def collect_features(dataset, feature_fn, cache_name: str) -> tuple[np.ndarray, np.ndarray]:
@@ -26,8 +29,8 @@ def collect_features(dataset, feature_fn, cache_name: str) -> tuple[np.ndarray, 
         feature_fn: A function that takes an embedding and returns a feature vector.
         cache_name: A name for the cache files.
     """
-    rows_path = DATA_DIR_OUT / f"{cache_name}_rows.npy"
-    labels_path = DATA_DIR_OUT / f"{cache_name}_labels.npy"
+    rows_path = TEMP_DIR / f"{cache_name}_rows.npy"
+    labels_path = TEMP_DIR / f"{cache_name}_labels.npy"
 
     if rows_path.exists() and labels_path.exists():
         print(f"Loading cached features from {rows_path}")
@@ -37,7 +40,7 @@ def collect_features(dataset, feature_fn, cache_name: str) -> tuple[np.ndarray, 
 
     n_texts = int(sys.argv[1]) if len(sys.argv) > 1 else len(dataset)
     n_texts = min(n_texts, len(dataset))
-    print(f"N_texts: {n_texts}")
+    print(f"Going to process {n_texts} texts from the dataset (cache: {cache_name})...")
 
     rows, labels = [], []
     for i in tqdm(range(n_texts)):
@@ -46,14 +49,23 @@ def collect_features(dataset, feature_fn, cache_name: str) -> tuple[np.ndarray, 
         labels.append(label)
 
     X, y = np.array(rows), np.array(labels)
-    DATA_DIR_OUT.mkdir(parents=True, exist_ok=True)
+    TEMP_DIR.mkdir(parents=True, exist_ok=True)
     np.save(rows_path, X)
     np.save(labels_path, y)
     print(f"Saved data to {cache_name}_*.npy")
     return X, y
 
 
-def run(X: np.ndarray, y: np.ndarray):
+def train_eval(X_train: np.ndarray, y_train: np.ndarray, X_test: np.ndarray, y_test: np.ndarray):
+    clf = LogisticRegression(max_iter=1000).fit(X_train, y_train)
+    y_pred = clf.predict(X_test)
+    y_prob = clf.predict_proba(X_test)[:, 1]
+    print(f"ROC-AUC:  {roc_auc_score(y_test, y_prob):.3f}")
+    print(f"Accuracy: {accuracy_score(y_test, y_pred):.3f}")
+    print(f"F1-Score: {f1_score(y_test, y_pred):.3f}")
+
+
+def cross_validate(X: np.ndarray, y: np.ndarray):
     print("Running cross_validate for logistic regression...")
     cv = cross_validate(LogisticRegression(max_iter=1000), X, y, cv=5,
                         scoring=["roc_auc", "accuracy", "f1"])

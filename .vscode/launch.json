@@ -10,7 +10,7 @@
             "console": "integratedTerminal",
              "env": {},
             "python": "/home/kishmakov/jupyter-env/bin/python",
-            "cwd": "/home/kishmakov/Repos/shad/detector/main_paper_data/data"
+            "cwd": "/home/kishmakov/Repos/shad/detector/"
         }
     ]
 }
