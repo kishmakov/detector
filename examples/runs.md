@@ -1,25 +1,25 @@
 ## Basic linear regression detector
 
-```
-LogisticRegression(max_iter=1000)
+### Checking LogReg cross validation detection
 
-X = np.array([dataset[i][0].mean(axis=0) for i in range(len(dataset))])
-y = np.array([dataset[i][1] for i in range(len(dataset))])
-```
+#### train=reddit, test=wiki
 
-### N_texts = 8922
+| Completions |   all |  gpt3 |
+|-------------|-------|-------|
+|     ROC-AUC | 0.559 | 0.706 |
+|    Accuracy | 0.702 | 0.571 |
+|    F1-Score | 0.116 | 0.377 |
 
-- ROC-AUC: 0.998 ± 0.002
-- Accuracy: 0.982 ± 0.010
--  F1-Score: 0.982 ± 0.010
+#### train=wiki, test=reddit, completions=all
 
-### N_texts = 200
-
-- ROC-AUC:  1.000 ± 0.000
-- Accuracy: 0.990 ± 0.012
-- F1-Score: 0.990 ± 0.013
+| Completions |   all |  gpt3 |
+|-------------|-------|-------|
+|     ROC-AUC | 0.497 | 0.734 |
+|    Accuracy | 0.748 | 0.571 |
+|    F1-Score | 0.039 | 0.275 |
 
 
+<!--
 ## 6 magnitude features
 
 ```
@@ -42,4 +42,4 @@ y = np.array([dataset[i][1] for i in range(len(dataset))])
 
 - ROC-AUC:  0.815 ± 0.027
 - Accuracy: 0.820 ± 0.033
-- F1-Score: 0.779 ± 0.049
+- F1-Score: 0.779 ± 0.049 -->
