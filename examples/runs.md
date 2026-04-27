@@ -1,8 +1,8 @@
-## Basic linear regression detector
+# Various linear regression detector
 
-### Checking LogReg cross-domain detection
+## mean embedding + LogReg cross-domain detection
 
-#### train=reddit, test=wiki
+### train=reddit, test=wiki
 
 | Completions |   all |  gpt3 | gpt-5.4-mini | gemini-3.1-pro |
 |-------------|-------|-------|--------------|----------------|
@@ -10,13 +10,32 @@
 |    Accuracy | 0.702 | 0.571 |        0.377 |          0.598 |
 |    F1-Score | 0.116 | 0.377 |        0.371 |          0.332 |
 
-#### train=wiki, test=reddit
+### train=wiki, test=reddit
 
 | Completions |   all |  gpt3 | gpt-5.4-mini | gemini-3.1-pro |
 |-------------|-------|-------|--------------|----------------|
 |     ROC-AUC | 0.497 | 0.734 |        0.289 |          0.935 |
 |    Accuracy | 0.748 | 0.571 |        0.398 |          0.874 |
 |    F1-Score | 0.039 | 0.275 |        0.291 |          0.872 |
+
+## PHD + LogReg cross-domain detection
+
+### train=reddit, test=wiki
+
+| Completions |   all |  gpt3 | gpt-5.4-mini | gemini-3.1-pro |
+|-------------|-------|-------|--------------|----------------|
+|     ROC-AUC | ????? | 0.909 |        ????? |          ????? |
+|    Accuracy | ????? | 0.844 |        ????? |          ????? |
+|    F1-Score | ????? | 0.866 |        ????? |          ????? |
+
+### train=wiki, test=reddit
+
+| Completions |   all |  gpt3 | gpt-5.4-mini | gemini-3.1-pro |
+|-------------|-------|-------|--------------|----------------|
+|     ROC-AUC | ????? | 0.885 |        ????? |          ????? |
+|    Accuracy | ????? | 0.836 |        ????? |          ????? |
+|    F1-Score | ????? | 0.774 |        ????? |          ????? |
+
 
 
 <!--

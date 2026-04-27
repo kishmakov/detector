@@ -13,7 +13,7 @@ TEMP_DIR = ROOT / "tmp"
 
 _phd = PHD()
 
-MIN_TOKENS = 51  # need range(50, n_tokens, 40) be non-empty
+MIN_TOKENS = 91  # need range(50, n_tokens, 40) to have ≥2 points for slope
 
 
 def collect_phd_features(dataset, cache_name: str) -> tuple[np.ndarray, np.ndarray]:
@@ -49,7 +49,9 @@ def collect_phd_features(dataset, cache_name: str) -> tuple[np.ndarray, np.ndarr
     np.save(rows_path, X)
     np.save(labels_path, y)
     print(f"Saved data to {cache_name}_*.npy")
-    return X, y
+
+    mask = ~np.isnan(X).any(axis=1)
+    return X[mask], y[mask]
 
 
 def run_experiment(train, test, model):
@@ -63,14 +65,14 @@ def run_experiment(train, test, model):
 
 
 experiments = [
-    ("reddit", "wiki",   None),           #1: train=reddit, test=wiki, completions=all
-    ("wiki",   "reddit", None),           #2: train=wiki, test=reddit, completions=all
+    # ("reddit", "wiki",   None),           #1: train=reddit, test=wiki, completions=all
+    # ("wiki",   "reddit", None),           #2: train=wiki, test=reddit, completions=all
     ("reddit", "wiki",   "gpt3"),         #3: train=reddit, test=wiki, completions=gpt3
     ("wiki",   "reddit", "gpt3"),         #4: train=wiki, test=reddit, completions=gpt3
-    ("reddit", "wiki",   "gpt-5.4-mini"), #5: train=reddit, test=wiki, completions=gpt-5.4-mini
-    ("wiki",   "reddit", "gpt-5.4-mini"), #6: train=wiki, test=reddit, completions=gpt-5.4-mini
-    ("reddit", "wiki",   "gemini-3.1-pro"), #7: train=reddit, test=wiki, completions=gemini-3.1-pro
-    ("wiki",   "reddit", "gemini-3.1-pro"), #8: train=wiki, test=reddit, completions=gemini-3.1-pro
+    # ("reddit", "wiki",   "gpt-5.4-mini"), #5: train=reddit, test=wiki, completions=gpt-5.4-mini
+    # ("wiki",   "reddit", "gpt-5.4-mini"), #6: train=wiki, test=reddit, completions=gpt-5.4-mini
+    # ("reddit", "wiki",   "gemini-3.1-pro"), #7: train=reddit, test=wiki, completions=gemini-3.1-pro
+    # ("wiki",   "reddit", "gemini-3.1-pro"), #8: train=wiki, test=reddit, completions=gemini-3.1-pro
 ]
 
 for train, test, model in experiments:
