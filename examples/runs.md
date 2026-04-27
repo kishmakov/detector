@@ -1,6 +1,6 @@
 ## Basic linear regression detector
 
-### Checking LogReg cross validation detection
+### Checking LogReg cross-domain detection
 
 #### train=reddit, test=wiki
 
@@ -10,7 +10,7 @@
 |    Accuracy | 0.702 | 0.571 |        0.377 |          0.598 |
 |    F1-Score | 0.116 | 0.377 |        0.371 |          0.332 |
 
-#### train=wiki, test=reddit, completions=all
+#### train=wiki, test=reddit
 
 | Completions |   all |  gpt3 | gpt-5.4-mini | gemini-3.1-pro |
 |-------------|-------|-------|--------------|----------------|

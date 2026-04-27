@@ -6,7 +6,7 @@ from src.logistic_regression import make_dataset, collect_features, train_eval
 
 feature_fn = lambda emb: emb.mean(axis=0)
 
-def run_experiment(train, test, model=None):
+def run_experiment(train, test, model):
     suffix = f"_{model}" if model else ""
     ds_train = make_dataset(source=train, model=model)
     ds_test  = make_dataset(source=test, model=model)
