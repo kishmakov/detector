@@ -1,10 +1,10 @@
 import os
+import time
 import numpy as np
 from pathlib import Path
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score, accuracy_score, f1_score
 from sklearn.model_selection import cross_validate as _cv
-from tqdm import tqdm
 
 from .embeddings_dataset import EmbeddingsDataset
 from .embeddings_provider import embeddings_provider_by_name
@@ -43,13 +43,19 @@ def collect_features(
 
     print(f"Computing features for {len(dataset)} texts (cache: {cache_name})...")
     rows, labels = [], []
-    for i in tqdm(range(len(dataset))):
+    total = len(dataset)
+    started_at = time.perf_counter()
+    for i in range(total):
         emb, label = dataset[i]
         feat = feature_fn(emb)
         if feat is None:
             continue
         rows.append(feat)
         labels.append(label)
+        finished = i + 1
+        if finished % 100 == 0 or finished == total:
+            avg_time = (time.perf_counter() - started_at) / finished
+            print(f"Finished {finished}/{total} steps; avg {avg_time:.3f}s/step")
 
     X, y = np.array(rows), np.array(labels)
     tmp_dir.mkdir(parents=True, exist_ok=True)
@@ -66,13 +72,10 @@ def train_eval(X_train: np.ndarray, y_train: np.ndarray, X_test: np.ndarray, y_t
     y_pred = clf.predict(X_test)
     y_prob = clf.predict_proba(X_test)[:, 1]
     metrics = {
-        "roc_auc":  round(float(roc_auc_score(y_test, y_prob)), 3),
-        "accuracy": round(float(accuracy_score(y_test, y_pred)), 3),
-        "f1":       round(float(f1_score(y_test, y_pred)), 3),
+        "ROC-AUC":  round(float(roc_auc_score(y_test, y_prob)), 3),
+        "Accuracy": round(float(accuracy_score(y_test, y_pred)), 3),
+        "F1-Score": round(float(f1_score(y_test, y_pred)), 3),
     }
-    print(f"ROC-AUC:  {metrics['roc_auc']:.3f}")
-    print(f"Accuracy: {metrics['accuracy']:.3f}")
-    print(f"F1-Score: {metrics['f1']:.3f}")
     return metrics
 
 
