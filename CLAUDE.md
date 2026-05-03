@@ -20,13 +20,34 @@ Replication and exploration of https://arxiv.org/abs/2306.04723 — AI-text dete
 | `embeddings_dataset.py` | PyTorch Dataset wrapping DB iterator |
 | `db_iterator.py` | Iterate over completions gathered from `completions.db` |
 | `magnitude.py` | Magnitude function for intrinsic dimension estimation |
-| `logistic_regression.py` | Tools for train/eval logistic regression classifier |
+| `intrinsic_dim.py` | PHD-based feature extraction (`phd_features`) |
+| `logistic_regression.py` | `mean_features`, `collect_features`, `train_eval` (returns dict), `make_dataset` |
 | `text_utils.py` | Text preprocessing helpers |
+
+# Experiments (`scripts/`)
+
+Two runner scripts drive all experiments. Both accept the same extra args (e.g. `--method`):
+
+```
+uv run scripts/run_locally.py  --method phd
+uv run scripts/run_on_euler.py --method logreg
+```
+
+| Script | Purpose |
+|---|---|
+| `run_locally.py` | Run all 8 train/test splits sequentially on the local machine |
+| `run_on_euler.py` | Submit all 8 splits as a SLURM array job on Euler (tasks 0–7) |
+| `run_common.py` | Shared experiment entry point; accepts `--exp N`, `--tmp-dir DIR`, `--method phd\|logreg` |
+
+Available methods: `phd` (intrinsic dimension), `logreg` (mean-embedding logistic regression).
+
+Each run writes metrics to `tmp/exp_N/run_<train>_<test>_<model>_<method>.txt`.
+
+`DETECTOR_ROOT` env var must point to the repo root; both runners set it automatically.
 
 # Examples (`examples/`)
 
 - `test_magnitude.py` — test magnitude-based detection
-- `test_simple_logreg.py` — test logistic regression detection
 - `make_plots.py` — generate per-text embedding plots
 - `texts/` / `plots/` — sample texts and their output plots
 - `runs.md` — log of experiment runs
