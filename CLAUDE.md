@@ -54,3 +54,9 @@ API: `GET /health` → `{"status":"ok"}`, `POST /analyze` `{"text":"..."}` → `
 ## `chrome/` — browser extension
 
 Load unpacked from `chrome://extensions`. Right-click selected text → **Analyze** → check service worker console for result.
+
+# Euler Access
+
+Use this command to access Euler computational cluster from ETH:
+
+`SSHPASS="$SSH_EULER_PASS" sshpass -e ssh EULER`
