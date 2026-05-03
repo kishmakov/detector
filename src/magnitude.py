@@ -147,3 +147,10 @@ class MagnitudeEstimator:
         ]
         runs = [r for r in runs if r is not None]
         return np.nanmean(runs, axis=0) if runs else np.full(6, np.nan)
+
+
+_ESTIMATOR = MagnitudeEstimator()
+
+
+def magnitude_features(X: np.ndarray) -> np.ndarray:
+    return _ESTIMATOR.magnitude_features(X)

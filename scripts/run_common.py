@@ -9,6 +9,7 @@ ROOT = Path(os.environ.get("DETECTOR_ROOT", Path(__file__).resolve().parents[1])
 sys.path.insert(0, str(ROOT))
 from src.logistic_regression import make_dataset, collect_features, train_eval, mean_features
 from src.intrinsic_dim import phd_features
+from src.magnitude import magnitude_features
 
 EXPERIMENTS = [
     ("reddit", "wiki",   None),
@@ -22,8 +23,9 @@ EXPERIMENTS = [
 ]
 
 METHODS = {
-    "phd":    phd_features,
-    "logreg": mean_features,
+    "phd":       phd_features,
+    "logreg":    mean_features,
+    "magnitude": magnitude_features,
 }
 
 

@@ -26,12 +26,8 @@ def collect_features(
     dataset,
     feature_fn,
     cache_name: str,
-    tmp_dir: Path | None = None,
+    tmp_dir: Path,
 ) -> tuple[np.ndarray, np.ndarray]:
-    if tmp_dir is None:
-        root = Path(os.environ.get("DETECTOR_ROOT", Path(__file__).resolve().parents[1]))
-        tmp_dir = root / "tmp"
-
     rows_path   = tmp_dir / f"{cache_name}_rows.npy"
     labels_path = tmp_dir / f"{cache_name}_labels.npy"
 

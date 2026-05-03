@@ -148,19 +148,20 @@ job_id = ssh(f"sbatch {SCRATCH}/run_array.sh").split()[-1]
 print(f"Submitted array job {job_id} ({task_description})")
 print(f"Requested per task: {args.cpus} CPU(s), {args.mem_per_cpu} memory per CPU, {args.hours} hour(s)")
 if args.exp is None:
-    output_path = f"{SCRATCH}/tmp/output_{job_id}_N.txt"
-    metrics_path = f"{SCRATCH}/tmp/results_{job_id}_N_<exp_tag>.txt"
+    output_path = f"{SCRATCH}/tmp/output_{job_id}_*.txt"
+    metrics_path = f"{SCRATCH}/tmp/results_{job_id}_*.txt"
 else:
     output_path = f"{SCRATCH}/tmp/output_{job_id}_{args.exp}.txt"
     metrics_path = f"{SCRATCH}/tmp/results_{job_id}_{args.exp}_{task_description}.txt"
 print("Files:")
 print(f"  Output: {output_path}")
-print(f"  Metric: {metrics_path}")
+print(f"  Metrics: {metrics_path}")
 
 if args.exp is None:
-    print("  N = 0-7")
+    print("  Tasks: 0-7")
 
 print()
 print(f'Track:   SSHPASS="$SSH_EULER_PASS" sshpass -e ssh EULER "squeue -u kshmakov"')
+print(f'Cancel:  SSHPASS="$SSH_EULER_PASS" sshpass -e ssh EULER "scancel {job_id}"')
 print(f'Output:  SSHPASS="$SSH_EULER_PASS" sshpass -e ssh EULER "cat {output_path}"')
 print(f'Metrics: SSHPASS="$SSH_EULER_PASS" sshpass -e ssh EULER "cat {metrics_path}"')
