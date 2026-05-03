@@ -8,6 +8,7 @@ feature_fn = lambda emb: emb.mean(axis=0)
 
 def run_experiment(train, test, model):
     suffix = f"_{model}" if model else ""
+    print(f"\n=== train={train}, test={test}, model={model or 'all'} ===")
     ds_train = make_dataset(source=train, model=model)
     ds_test  = make_dataset(source=test, model=model)
     X_train, y_train = collect_features(ds_train, feature_fn, f"{train}_mean{suffix}")
