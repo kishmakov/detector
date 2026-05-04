@@ -1,6 +1,6 @@
 # Various linear regression detector
 
-Human texts labeled as 1, generated as 0
+Human texts labeled as 0, generated as 1
 
 ## mean embedding + LogReg cross-domain detection
 
@@ -10,9 +10,9 @@ Human texts labeled as 1, generated as 0
 |-------------|-------|-------|--------------|----------------|
 |     ROC-AUC | 0.566 | 0.706 |        0.349 |          0.957 |
 |    Accuracy | 0.710 | 0.571 |        0.389 |          0.598 |
-|   Precision | 0.104 | 0.645 |        0.388 |          0.982 |
-|      Recall | 0.110 | 0.267 |        0.384 |          0.199 |
-|    F1-Score | 0.107 | 0.377 |        0.386 |          0.332 |
+|   Precision | 0.831 | 0.552 |        0.390 |          0.554 |
+|      Recall | 0.823 | 0.861 |        0.394 |          0.996 |
+|    F1-Score | 0.827 | 0.673 |        0.392 |          0.712 |
 
 ### train=wiki, test=reddit
 
@@ -20,9 +20,9 @@ Human texts labeled as 1, generated as 0
 |-------------|-------|-------|--------------|----------------|
 |     ROC-AUC | 0.498 | 0.734 |        0.287 |          0.935 |
 |    Accuracy | 0.748 | 0.571 |        0.395 |          0.874 |
-|   Precision | 0.407 | 0.892 |        0.351 |          0.886 |
-|      Recall | 0.021 | 0.162 |        0.247 |          0.858 |
-|    F1-Score | 0.039 | 0.275 |        0.290 |          0.872 |
+|   Precision | 0.752 | 0.539 |        0.419 |          0.863 |
+|      Recall | 0.990 | 0.980 |        0.543 |          0.890 |
+|    F1-Score | 0.855 | 0.696 |        0.473 |          0.876 |
 
 ## PHD + LogReg cross-domain detection
 
@@ -30,21 +30,21 @@ Human texts labeled as 1, generated as 0
 
 | Completions |   all |  gpt3 | gpt-5.4-mini | gemini-3.1-pro |
 |-------------|-------|-------|--------------|----------------|
-|     ROC-AUC | 0.677 | 0.910 |        0.510 |          0.796 |
-|    Accuracy | 0.810 | 0.843 |        0.223 |          0.572 |
+|     ROC-AUC | 0.    | 0.    |        0.    |          0.    |
+|    Accuracy | 0.    | 0.    |        0.    |          0.    |
 |   Precision |       |       |              |                |
 |      Recall |       |       |              |                |
-|    F1-Score | 0.000 | 0.866 |        0.000 |          0.297 |
+|    F1-Score | 0.    | 0.    |        0.    |          0.    |
 
 ### train=wiki, test=reddit
 
 | Completions |   all |  gpt3 | gpt-5.4-mini | gemini-3.1-pro |
 |-------------|-------|-------|--------------|----------------|
-|     ROC-AUC | 0.551 | 0.884 |        0.548 |          0.675 |
-|    Accuracy | 0.821 | 0.835 |        0.397 |          0.577 |
+|     ROC-AUC | 0.    | 0.    |        0.    |          0.    |
+|    Accuracy | 0.    | 0.    |        0.    |          0.    |
 |   Precision |       |       |              |                |
 |      Recall |       |       |              |                |
-|    F1-Score | 0.013 | 0.772 |        0.568 |          0.580 |
+|    F1-Score | 0.    | 0.    |        0.    |          0.    |
 
 ## Magnitude + LogReg cross-domain detection
 
@@ -52,21 +52,21 @@ Human texts labeled as 1, generated as 0
 
 | Completions |   all |  gpt3 | gpt-5.4-mini | gemini-3.1-pro |
 |-------------|-------|-------|--------------|----------------|
-|     ROC-AUC | 0.208 | 0.134 |        0.015 |          0.505 |
-|    Accuracy | 0.602 | 0.251 |        0.049 |          0.500 |
+|     ROC-AUC | 0.    | 0.    |        0.    |          0.    |
+|    Accuracy | 0.    | 0.    |        0.    |          0.    |
 |   Precision |       |       |              |                |
 |      Recall |       |       |              |                |
-|    F1-Score | 0.003 | 0.005 |        0.004 |          0.008 |
+|    F1-Score | 0.    | 0.    |        0.    |          0.    |
 
 ### train=wiki, test=reddit
 
 | Completions |   all |  gpt3 | gpt-5.4-mini | gemini-3.1-pro |
 |-------------|-------|-------|--------------|----------------|
-|     ROC-AUC | 0.202 | 0.277 |        0.214 |          0.735 |
-|    Accuracy | 0.750 | 0.216 |        0.228 |          0.619 |
+|     ROC-AUC | 0.    | 0.    |        0.    |          0.    |
+|    Accuracy | 0.    | 0.    |        0.    |          0.    |
 |   Precision |       |       |              |                |
 |      Recall |       |       |              |                |
-|    F1-Score | 0.000 | 0.320 |        0.371 |          0.659 |
+|    F1-Score | 0.    | 0.    |        0.    |          0.    |
 
 
 <!--

@@ -18,6 +18,9 @@ class EmbeddingsDataset(Dataset):
     def __len__(self):
         return len(self._texts)
 
+    def labels(self) -> list[int]:
+        return [label for _, label in self._texts]
+
     def __getitem__(self, idx):
         text, label = self._texts[idx]
         emb = self._embedder.text_to_embeddings(text)

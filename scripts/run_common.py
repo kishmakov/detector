@@ -7,7 +7,13 @@ from pathlib import Path
 
 ROOT = Path(os.environ.get("DETECTOR_ROOT", Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(ROOT))
-from src.logistic_regression import make_dataset, collect_features, train_eval, mean_features
+from src.logistic_regression import (
+    make_dataset,
+    collect_features,
+    train_eval,
+    cross_validate,
+    mean_features,
+)
 from src.intrinsic_dim import phd_features
 from src.magnitude import magnitude_features
 
@@ -20,6 +26,14 @@ EXPERIMENTS = [
     ("wiki",   "reddit", "gpt-5.4-mini"),
     ("reddit", "wiki",   "gemini-3.1-pro"),
     ("wiki",   "reddit", "gemini-3.1-pro"),
+    ("reddit", "reddit", None),
+    ("wiki",   "wiki",   None),
+    ("reddit", "reddit", "gpt3"),
+    ("wiki",   "wiki",   "gpt3"),
+    ("reddit", "reddit", "gpt-5.4-mini"),
+    ("wiki",   "wiki",   "gpt-5.4-mini"),
+    ("reddit", "reddit", "gemini-3.1-pro"),
+    ("wiki",   "wiki",   "gemini-3.1-pro"),
 ]
 
 DEFAULT_EXPERIMENTS = tuple(range(len(EXPERIMENTS)))
@@ -113,9 +127,18 @@ def run_experiment(
     exp_tag = experiment_tag(exp_idx, method)
     print(f"exp={exp_idx}  train={train_src}  test={test_src}  model={model_tag}  method={method}")
 
-    Xtr, ytr = collect_features(make_dataset(source=train_src, model=model), feature_fn, f"{exp_tag}_train", tmp_dir)
-    Xte, yte = collect_features(make_dataset(source=test_src,  model=model), feature_fn, f"{exp_tag}_test",  tmp_dir)
-    metrics = train_eval(Xtr, ytr, Xte, yte)
+    if train_src == test_src:
+        X, y = collect_features(
+            make_dataset(source=train_src, model=model),
+            feature_fn,
+            f"{exp_tag}_cv",
+            tmp_dir,
+        )
+        metrics = cross_validate(X, y)
+    else:
+        Xtr, ytr = collect_features(make_dataset(source=train_src, model=model), feature_fn, f"{exp_tag}_train", tmp_dir)
+        Xte, yte = collect_features(make_dataset(source=test_src,  model=model), feature_fn, f"{exp_tag}_test",  tmp_dir)
+        metrics = train_eval(Xtr, ytr, Xte, yte)
 
     key_width = max(len(k) for k in metrics)
     results_path.write_text("\n".join(f"{k:<{key_width}} : {v}" for k, v in metrics.items()) + "\n")
