@@ -24,6 +24,15 @@ Human texts labeled as 0, generated as 1
 |      Recall | 0.990 | 0.980 |        0.543 |          0.890 |
 |    F1-Score | 0.855 | 0.696 |        0.473 |          0.876 |
 
+### cross-validation on reddit
+
+| Completions |   all |  gpt3 | gpt-5.4-mini | gemini-3.1-pro |
+|-------------|-------|-------|--------------|----------------|
+|     ROC-AUC | 0.999 | 1.000 |        0.999 |          0.999 |
+|    Accuracy | 0.990 | 0.995 |        0.991 |          0.992 |
+|    F1-Score | 0.993 | 0.995 |        0.991 |          0.992 |
+
+
 ## PHD + LogReg cross-domain detection
 
 ### train=reddit, test=wiki
