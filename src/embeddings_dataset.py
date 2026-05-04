@@ -11,9 +11,9 @@ class EmbeddingsDataset(Dataset):
         self._texts = []  # (text, label)
 
         for _, _, gold, gens in db_iterator(database_path, source=source, model=model):
-            self._texts.append((gold, 1))
+            self._texts.append((gold, 0))
             for _, gen_text in gens:
-                self._texts.append((gen_text, 0))
+                self._texts.append((gen_text, 1))
 
     def __len__(self):
         return len(self._texts)

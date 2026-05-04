@@ -2,7 +2,7 @@
 """
 Submit train/test splits as SLURM jobs on Euler.
 Usage: uv run scripts/run_on_euler.py [slurm args] [experiment args...]
-Example: uv run scripts/run_on_euler.py --cpus 2 --hours 4 --method logreg --exp 2
+Example: uv run scripts/run_on_euler.py --cpus 2 --hours 4 --method logreg --exp 2,4
 """
 import argparse
 import os
@@ -17,7 +17,7 @@ ROOT    = Path(__file__).resolve().parents[1]
 SCRIPT  = ROOT / "scripts" / "run_common.py"
 
 os.environ["DETECTOR_ROOT"] = str(ROOT)
-from run_common import EXPERIMENTS, METHODS, experiment_tag
+from run_common import add_experiment_args
 
 
 def positive_int(value: str) -> int:
@@ -28,15 +28,13 @@ def positive_int(value: str) -> int:
 
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--exp", type=int, choices=range(len(EXPERIMENTS)), metavar="N",
-                help="Run only experiment N instead of submitting the full 0-7 array.")
-ap.add_argument("--method", choices=METHODS, required=True)
+add_experiment_args(ap)
 ap.add_argument("--cpus", type=positive_int, default=4,
                 help="CPU cores per task.")
-ap.add_argument("--hours", type=positive_int, default=6,
+ap.add_argument("--hours", type=positive_int, default=4,
                 help="Wall-clock limit per task, in hours.")
-ap.add_argument("--mem-per-cpu", default="1G",
-                help="Memory per CPU core. Euler rejects node-level --mem requests.")
+ap.add_argument("--mem-per-cpu", default="512",
+                help="Memory per CPU core.")
 args, extra = ap.parse_known_args()
 extra_str = shlex.join(extra)
 
@@ -108,14 +106,14 @@ write_remote(remote_script, SCRIPT.read_text())
 
 # ── SLURM script ───────────────────────────────────────────────────────────────
 
-array_spec = str(args.exp) if args.exp is not None else "0-7"
-task_description = experiment_tag(args.exp, args.method) if args.exp is not None else "tasks 0-7"
+array_spec = ",".join(str(exp_idx) for exp_idx in args.exp)
+task_description = f"tasks {array_spec}"
 
 sbatch = f"""\
 #!/bin/bash
 #SBATCH --job-name=intrinsic_dim
 #SBATCH --output={SCRATCH}/tmp/output_%A_%a.txt
-#SBATCH --partition=bigmem.24h
+#SBATCH --partition=normal.4h
 #SBATCH --array={array_spec}
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task={args.cpus}
@@ -147,21 +145,12 @@ write_remote(f"{SCRATCH}/run_array.sh", sbatch)
 job_id = ssh(f"sbatch {SCRATCH}/run_array.sh").split()[-1]
 print(f"Submitted array job {job_id} ({task_description})")
 print(f"Requested per task: {args.cpus} CPU(s), {args.mem_per_cpu} memory per CPU, {args.hours} hour(s)")
-if args.exp is None:
-    output_path = f"{SCRATCH}/tmp/output_{job_id}_*.txt"
-    metrics_path = f"{SCRATCH}/tmp/results_{job_id}_*.txt"
-else:
-    output_path = f"{SCRATCH}/tmp/output_{job_id}_{args.exp}.txt"
-    metrics_path = f"{SCRATCH}/tmp/results_{job_id}_{args.exp}_{task_description}.txt"
+output_path = f"{SCRATCH}/tmp/output_{job_id}_*.txt"
 print("Files:")
 print(f"  Output: {output_path}")
-print(f"  Metrics: {metrics_path}")
-
-if args.exp is None:
-    print("  Tasks: 0-7")
+print(f"  Tasks: {array_spec}")
 
 print()
 print(f'Track:   SSHPASS="$SSH_EULER_PASS" sshpass -e ssh EULER "squeue -u kshmakov"')
 print(f'Cancel:  SSHPASS="$SSH_EULER_PASS" sshpass -e ssh EULER "scancel {job_id}"')
 print(f'Output:  SSHPASS="$SSH_EULER_PASS" sshpass -e ssh EULER "cat {output_path}"')
-print(f'Metrics: SSHPASS="$SSH_EULER_PASS" sshpass -e ssh EULER "cat {metrics_path}"')

@@ -62,11 +62,11 @@ Human texts labeled as 1, generated as 0
 
 | Completions |   all |  gpt3 | gpt-5.4-mini | gemini-3.1-pro |
 |-------------|-------|-------|--------------|----------------|
-|     ROC-AUC |       | 0.277 |        0.214 |          0.735 |
-|    Accuracy |       | 0.216 |        0.228 |          0.619 |
+|     ROC-AUC | 0.202 | 0.277 |        0.214 |          0.735 |
+|    Accuracy | 0.750 | 0.216 |        0.228 |          0.619 |
 |   Precision |       |       |              |                |
 |      Recall |       |       |              |                |
-|    F1-Score |       | 0.320 |        0.371 |          0.659 |
+|    F1-Score | 0.000 | 0.320 |        0.371 |          0.659 |
 
 
 <!--
