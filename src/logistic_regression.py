@@ -3,7 +3,7 @@ import time
 import numpy as np
 from pathlib import Path
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import roc_auc_score, accuracy_score, f1_score
+from sklearn.metrics import accuracy_score, f1_score, recall_score, roc_auc_score, precision_score
 from sklearn.model_selection import cross_validate as _cv
 
 from .embeddings_dataset import EmbeddingsDataset
@@ -70,6 +70,8 @@ def train_eval(X_train: np.ndarray, y_train: np.ndarray, X_test: np.ndarray, y_t
     metrics = {
         "ROC-AUC":  round(float(roc_auc_score(y_test, y_prob)), 3),
         "Accuracy": round(float(accuracy_score(y_test, y_pred)), 3),
+        "Precision": round(float(precision_score(y_test, y_pred)), 3),
+        "Recall":    round(float(recall_score(y_test, y_pred)), 3),
         "F1-Score": round(float(f1_score(y_test, y_pred)), 3),
     }
     return metrics
