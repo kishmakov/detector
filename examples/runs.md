@@ -47,21 +47,21 @@ Human texts labeled as 0, generated as 1
 
 | Completions |   all |  gpt3 | gpt-5.4-mini | gemini-3.1-pro |
 |-------------|-------|-------|--------------|----------------|
-|     ROC-AUC | 0.    | 0.    |        0.497 |          0.    |
-|    Accuracy | 0.    | 0.    |        0.222 |          0.    |
-|   Precision |       |       |        0.222 |                |
-|      Recall |       |       |        0.992 |                |
-|    F1-Score | 0.    | 0.    |        0.363 |          0.    |
+|     ROC-AUC | 0.    | 0.914 |        0.497 |          0.793 |
+|    Accuracy | 0.    | 0.849 |        0.222 |          0.585 |
+|   Precision |       | 0.867 |        0.222 |          0.550 |
+|      Recall |       | 0.778 |        0.992 |          0.955 |
+|    F1-Score | 0.    | 0.820 |        0.363 |          0.698 |
 
 ### train=wiki, test=reddit
 
 | Completions |   all |  gpt3 | gpt-5.4-mini | gemini-3.1-pro |
 |-------------|-------|-------|--------------|----------------|
-|     ROC-AUC | 0.    | 0.    |        0.547 |          0.    |
-|    Accuracy | 0.    | 0.    |        0.397 |          0.    |
-|   Precision |       |       |        0.000 |                |
-|      Recall |       |       |        0.000 |                |
-|    F1-Score | 0.    | 0.    |        0.000 |          0.    |
+|     ROC-AUC | 0.    | 0.    |        0.547 |          0.669 |
+|    Accuracy | 0.    | 0.    |        0.397 |          0.570 |
+|   Precision |       |       |        0.000 |          0.724 |
+|      Recall |       |       |        0.000 |          0.464 |
+|    F1-Score | 0.    | 0.    |        0.000 |          0.566 |
 
 ## Magnitude + LogReg cross-domain detection
 

@@ -113,7 +113,6 @@ sbatch = f"""\
 #!/bin/bash
 #SBATCH --job-name={args.method}
 #SBATCH --output={SCRATCH}/tmp/output_%A_%a.txt
-#SBATCH --partition=normal.4h
 #SBATCH --array={array_spec}
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task={args.cpus}
