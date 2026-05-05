@@ -111,7 +111,7 @@ task_description = f"tasks {array_spec}"
 
 sbatch = f"""\
 #!/bin/bash
-#SBATCH --job-name=intrinsic_dim
+#SBATCH --job-name={args.method}
 #SBATCH --output={SCRATCH}/tmp/output_%A_%a.txt
 #SBATCH --partition=normal.4h
 #SBATCH --array={array_spec}

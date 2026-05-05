@@ -32,6 +32,14 @@ Human texts labeled as 0, generated as 1
 |    Accuracy | 0.990 | 0.995 |        0.991 |          0.992 |
 |    F1-Score | 0.993 | 0.995 |        0.991 |          0.992 |
 
+### cross-validation on wiki
+
+| Completions |   all |  gpt3 | gpt-5.4-mini | gemini-3.1-pro |
+|-------------|-------|-------|--------------|----------------|
+|     ROC-AUC | 0.995 | 0.998 |        0.999 |          1.000 |
+|    Accuracy | 0.992 | 0.991 |        0.993 |          0.996 |
+|    F1-Score | 0.995 | 0.991 |        0.993 |          0.996 |
+
 
 ## PHD + LogReg cross-domain detection
 
@@ -39,21 +47,21 @@ Human texts labeled as 0, generated as 1
 
 | Completions |   all |  gpt3 | gpt-5.4-mini | gemini-3.1-pro |
 |-------------|-------|-------|--------------|----------------|
-|     ROC-AUC | 0.    | 0.    |        0.    |          0.    |
-|    Accuracy | 0.    | 0.    |        0.    |          0.    |
-|   Precision |       |       |              |                |
-|      Recall |       |       |              |                |
-|    F1-Score | 0.    | 0.    |        0.    |          0.    |
+|     ROC-AUC | 0.    | 0.    |        0.497 |          0.    |
+|    Accuracy | 0.    | 0.    |        0.222 |          0.    |
+|   Precision |       |       |        0.222 |                |
+|      Recall |       |       |        0.992 |                |
+|    F1-Score | 0.    | 0.    |        0.363 |          0.    |
 
 ### train=wiki, test=reddit
 
 | Completions |   all |  gpt3 | gpt-5.4-mini | gemini-3.1-pro |
 |-------------|-------|-------|--------------|----------------|
-|     ROC-AUC | 0.    | 0.    |        0.    |          0.    |
-|    Accuracy | 0.    | 0.    |        0.    |          0.    |
-|   Precision |       |       |              |                |
-|      Recall |       |       |              |                |
-|    F1-Score | 0.    | 0.    |        0.    |          0.    |
+|     ROC-AUC | 0.    | 0.    |        0.547 |          0.    |
+|    Accuracy | 0.    | 0.    |        0.397 |          0.    |
+|   Precision |       |       |        0.000 |                |
+|      Recall |       |       |        0.000 |                |
+|    F1-Score | 0.    | 0.    |        0.000 |          0.    |
 
 ## Magnitude + LogReg cross-domain detection
 
