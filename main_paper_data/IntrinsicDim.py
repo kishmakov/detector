@@ -7,7 +7,7 @@ MINIMAL_CLOUD = 80
 
 def prim_tree(adj_matrix, alpha=1.0):
     infty = np.max(adj_matrix) + 10
-    
+
     dst = np.ones(adj_matrix.shape[0]) * infty
     visited = np.zeros(adj_matrix.shape[0], dtype=bool)
     ancestor = -np.ones(adj_matrix.shape[0], dtype=int)
@@ -18,10 +18,10 @@ def prim_tree(adj_matrix, alpha=1.0):
         ancestor[dst > adj_matrix[v]] = v
         dst = np.minimum(dst, adj_matrix[v])
         dst[visited] = infty
-        
+
         v = np.argmin(dst)
         s += (adj_matrix[v][ancestor[v]] ** alpha)
-        
+
     return s.item()
 
 def process_string(sss):
@@ -61,7 +61,7 @@ class PHD():
                 restarts = self.n_points_min
             else:
                 restarts = self.n_points
-               
+
             reruns = np.ones(restarts)
             for i in range(restarts):
                 tmp = self._sample_W(W, n)
@@ -75,12 +75,12 @@ class PHD():
 
         x = np.log(np.array(list(test_n)))
         y = np.log(lengths)
-        N = len(x)   
+        N = len(x)
         outp[thread_id] = (N * (x * y).sum() - x.sum() * y.sum()) / (N * (x ** 2).sum() - x.sum() ** 2)
-        
+
     def fit_transform(self, X, y=None, min_points=50, max_points=512, point_jump=40, dist=False):
         '''
-        Computing the PH-dim 
+        Computing the PH-dim
         Parameters:
         1) X --- point cloud of shape (n_points, n_features), or precomputed distance matrix (n_points, n_points) if parameter dist set to 'True'
         2) y --- fictional parameter to fit with Sklearn interface
