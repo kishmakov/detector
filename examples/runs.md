@@ -85,44 +85,19 @@ Human texts labeled as 0, generated as 1
 
 | Completions |   all |  gpt3 | gpt-5.4-mini | gemini-3.1-pro |
 |-------------|-------|-------|--------------|----------------|
-|     ROC-AUC | 0.    | 0.    |        0.    |          0.    |
-|    Accuracy | 0.    | 0.    |        0.    |          0.    |
-|   Precision |       |       |              |                |
-|      Recall |       |       |              |                |
-|    F1-Score | 0.    | 0.    |        0.    |          0.    |
+|     ROC-AUC | 0.208 | 0.134 |        0.015 |          0.505 |
+|    Accuracy | 0.602 | 0.251 |        0.049 |          0.500 |
+|   Precision | 0.793 | 0.339 |        0.086 |          0.500 |
+|      Recall | 0.714 | 0.486 |        0.094 |          0.996 |
+|    F1-Score | 0.751 | 0.400 |        0.090 |          0.666 |
 
 ### train=wiki, test=reddit
 
 | Completions |   all |  gpt3 | gpt-5.4-mini | gemini-3.1-pro |
 |-------------|-------|-------|--------------|----------------|
-|     ROC-AUC | 0.    | 0.    |        0.    |          0.    |
-|    Accuracy | 0.    | 0.    |        0.    |          0.    |
-|   Precision |       |       |              |                |
-|      Recall |       |       |              |                |
-|    F1-Score | 0.    | 0.    |        0.    |          0.    |
+|     ROC-AUC | 0.202 | 0.277 |        0.214 |          0.733 |
+|    Accuracy | 0.750 | 0.216 |        0.228 |          0.618 |
+|   Precision | 0.750 | 0.092 |        0.003 |          0.653 |
+|      Recall | 1.000 | 0.064 |        0.002 |          0.505 |
+|    F1-Score | 0.857 | 0.076 |        0.002 |          0.570 |
 
-
-<!--
-## 6 magnitude features
-
-```
-0  slope_fine    — log-log slope over the lowest 1/3 of the scale range
-1  slope_medium  — log-log slope over the middle 1/3
-2  slope_coarse  — log-log slope over the upper 1/3
-3  slope_overall — log-log slope across the full range (= fit_transform)
-4  curvature     — 2nd-order coefficient of a quadratic log-log fit
-                    (positive ⟹ concave up, i.e. growing faster at large t)
-5  log_mag_mid   — log(|tA|) at the median scale
-```
-
-### N_texts = 8922
-
-- ROC-AUC:  0.383 ± 0.108
-- Accuracy: 0.349 ± 0.105
-- F1-Score: 0.326 ± 0.172
-
-### N_texts = 200
-
-- ROC-AUC:  0.815 ± 0.027
-- Accuracy: 0.820 ± 0.033
-- F1-Score: 0.779 ± 0.049 -->
